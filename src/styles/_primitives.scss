@@ -1,0 +1,19 @@
+%surface {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+}
+%row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+%muted {
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+%focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
