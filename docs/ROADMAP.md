@@ -14,6 +14,11 @@
 
 ## Etapa 2 — Banco e autenticação
 
+- [x] Author initial SQL migration: schema, constraints, indexes, grants, RLS, user/category initialization and financial audit.
+- [x] Author SQL regression scenarios (not executed).
+- [ ] Apply and validate the migration in Supabase.
+- [ ] Generate schema types and implement Auth, protected routes and persistence services.
+
 Migrations, constraints, índices, RLS, tipos gerados, Supabase Auth por e-mail/senha, rotas protegidas, ciclo de sessão, isolamento do cache e serviços persistentes. Validar acesso com dois usuários e referências cruzadas antes de módulos financeiros.
 
 ## Etapa 3 — Módulos financeiros

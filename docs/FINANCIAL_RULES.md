@@ -1,6 +1,17 @@
 # Regras financeiras — contrato para implementação
 
-As regras abaixo orientam a Etapa 3; **não estão implementadas** nesta fundação.
+As regras abaixo orientam a Etapa 3; **os fluxos financeiros ainda não estão implementados**. A migration inicial define a representação de dados e algumas constraints/triggers, mas ainda não foi aplicada nem executada.
+
+## Initial schema decisions
+
+- Transactions store standalone/recurring entries; installment purchases live only in plans and installments. Invoice payments are a separate cash event, not a second expense.
+- Invoice reference periods use the due month. Actual closing/due dates are explicit; cutoff generation remains pending rather than silently assuming issuer behavior.
+- Installment values use integer quotient/remainder allocation. Historical paid counts do not create cash movements. The first unpaid invoice month is explicit. Original plan terms and installment amounts are immutable; corrections require an auditable workflow.
+- Discounts require an anticipation date and a card explicitly permitting early settlement. Full settlement, cancellation propagation, overpayment checks and schedule completeness still require atomic RPCs.
+- Financial records use statuses instead of client deletion; inserts/updates are audited. Current row state alone is insufficient for historical as-of reports after reversals; preserve audit timestamps in those queries.
+- Unique immutable operation keys and recurring occurrence identities prevent duplicate rows when callers reuse the same keys. Retry handling and payload matching still belong to services.
+
+## Domain rules for Stage 3
 
 1. Caixa: saldo inicial mais entradas liquidadas menos saídas liquidadas até a data de referência. Receitas previstas não alteram o caixa.
 2. Projeção: caixa na data de referência somado às entradas previstas e deduzido das obrigações futuras ainda abertas até o horizonte. Não somar novamente valores liquidados. Meses anteriores/futuros exigem referências temporais explícitas.

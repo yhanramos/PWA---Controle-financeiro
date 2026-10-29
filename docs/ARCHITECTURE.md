@@ -4,6 +4,10 @@
 
 Etapa 1 implementada: aplicação client-side React/TypeScript/Vite; arquitetura por funcionalidades; layout mobile-first; rotas com carregamento sob demanda; infraestrutura de query, validação, PWA e cliente Supabase opcional. O dashboard inicial usa placeholders explícitos, sem séries inventadas. O seletor de mês usa calendário em UTC para aritmética e obtém o mês atual em America/Sao_Paulo.
 
+Stage 2 database artifact: `supabase/migrations/20261029000100_initial_schema.sql` defines the initial schema, ownership constraints, grants, RLS, Auth initialization and financial audit. It has not been applied or tested. Authentication integration and persistence services remain pending. See `DATABASE.md` for the distinction between row constraints already authored and transactional business rules still required.
+
+The Supabase React Router registry block has been installed with `@supabase/ssr`. Its browser entry at `src/lib/client.ts` is adapted to reuse the existing validated SPA singleton rather than creating a second cookie-backed client. The server helper at `src/lib/server.ts` is reserved for actual server loaders/actions and is not imported by the Vite browser application. Installing this helper does not enable SSR or authentication. User-provided public connection settings live only in ignored `.env.local`; connectivity and remote schema application have not been verified.
+
 ## Responsabilidades
 
 - `app`: composição, layout, rotas e providers.

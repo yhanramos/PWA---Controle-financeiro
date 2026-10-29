@@ -1,6 +1,6 @@
 # Clareza — Controle financeiro pessoal
 
-PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Esta entrega implementa somente a Etapa 1 — Fundação.** Não existe autenticação, persistência financeira, cálculo de saldos ou IA operante nesta versão. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
+PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Etapa 1 entregue; schema inicial da Etapa 2 disponível em SQL.** O script ainda não foi aplicado ao Supabase. Não existe autenticação integrada ao frontend, persistência financeira pela interface, cálculo de saldos ou IA operante nesta versão. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
 
 ## Pré-requisitos e instalação
 
@@ -18,7 +18,9 @@ VITE_SUPABASE_URL=https://SEU-PROJETO.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publica
 ```
 
-Use a chave **publishable** disponibilizada no painel do Supabase. Nunca coloque chaves secretas ou `service_role` em variáveis `VITE_*`. O cliente só é criado se a configuração for válida; isso não verifica conectividade. Não há migrations aplicáveis nesta etapa. Reinicie o servidor após alterar variáveis.
+Use a chave **publishable** disponibilizada no painel do Supabase. Nunca coloque chaves secretas ou `service_role` em variáveis `VITE_*`. O cliente só é criado se a configuração for válida; isso não verifica conectividade. A migration inicial está disponível conforme instruções abaixo. Reinicie o servidor após alterar variáveis.
+
+O bloco `@supabase/supabase-client-react-router` foi instalado pelo shadcn. O helper `src/lib/client.ts` reutiliza a instância existente em `src/lib/supabase/client.ts`, preservando a validação de ambiente e evitando múltiplos clientes de autenticação. O helper `src/lib/server.ts` é exclusivo para um futuro runtime de servidor; não é importado pela SPA e não cria um backend no Vite. A sessão permanece sem persistência até a implementação do fluxo de autenticação. Os valores locais fornecidos ficam em `.env.local`, ignorado pelo Git; `.env.example` permanece sem valores reais.
 
 ```sh
 npm run dev
@@ -60,7 +62,7 @@ npm run build
 npm run preview
 ```
 
-Os comandos de testes e build estão documentados para uso futuro, mas **não foram executados nesta entrega**, conforme instruções do projeto. Ainda não há casos de teste: apenas a infraestrutura. As regras financeiras receberão testes junto de sua implementação; `npm run test` reportará ausência de testes até então.
+Os comandos de testes e build estão documentados para uso futuro, mas **não foram executados**, conforme instruções do projeto. Ainda não há casos Vitest; `npm run test` reportará ausência de testes até então. Casos SQL do schema foram escritos em `supabase/tests/initial_schema.sql`, separados da migration e ainda não executados.
 
 Na instalação, o Vitest foi atualizado para 4.1.12 para eliminar os alertas críticos/moderados da versão inicialmente selecionada. A auditoria restante reporta quatro avisos de baixa severidade na cadeia de desenvolvimento `vite-plugin-pwa → workbox-build → @rollup/plugin-node-resolve → deepmerge`. O registro consultado ainda não oferece uma versão corrigida de deepmerge; não foi aplicado downgrade incompatível sugerido por `audit fix --force`. Reavaliar antes do deploy.
 
@@ -68,7 +70,11 @@ O Node padrão encontrado nesta máquina é 14 e não atende ao projeto. A insta
 
 ## Supabase e Gemini
 
-Na Etapa 2, criar migrations, policies RLS, tipos gerados do schema, autenticação e serviços. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
+Para criar as tabelas, abra **Supabase → SQL Editor → New query**, copie o conteúdo completo de [`20261029000100_initial_schema.sql`](supabase/migrations/20261029000100_initial_schema.sql) e execute como `postgres`. É um script de primeira instalação, para executar uma única vez em projeto sem estas tabelas. Não exige inserir chaves no SQL. Se já houver tabelas da aplicação, compare o schema antes de aplicar; não remova tabelas para forçar a execução.
+
+O script cria as 10 entidades previstas, `invoice_payments` para evitar dupla contagem de despesas e `financial_audit_log` para histórico de alterações, além de RLS, índices, constraints, perfil e categorias padrão por usuário. Leia [DATABASE.md](docs/DATABASE.md) para instruções, decisões e limites. A migration não foi executada localmente nem no seu Supabase.
+
+Continuam pendentes na Etapa 2: validar o schema aplicado, gerar tipos, integrar autenticação e criar serviços. Regras financeiras atômicas entram na Etapa 3. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
 
 Na Etapa 5, configurar `GEMINI_API_KEY` em Supabase Secrets e implementar `financial-assistant`. O frontend enviará chamadas autenticadas à Edge Function; não falará diretamente com Gemini. O placeholder de chave em `.env.example` é apenas documentação, não é utilizado pelo frontend.
 
