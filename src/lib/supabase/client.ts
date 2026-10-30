@@ -5,7 +5,7 @@ import { environment } from '@/lib/validators/environment';
 export const supabase = environment.success
   ? createClient(environment.data.url, environment.data.publishableKey, {
       auth: {
-        persistSession: false,
+        persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: false,
       },

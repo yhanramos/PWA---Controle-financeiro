@@ -4,7 +4,7 @@
 
 Etapa 1 implementada: aplicação client-side React/TypeScript/Vite; arquitetura por funcionalidades; layout mobile-first; rotas com carregamento sob demanda; infraestrutura de query, validação, PWA e cliente Supabase opcional. O dashboard inicial usa placeholders explícitos, sem séries inventadas. O seletor de mês usa calendário em UTC para aritmética e obtém o mês atual em America/Sao_Paulo.
 
-Stage 2 database artifact: `supabase/migrations/20261029000100_initial_schema.sql` defines the initial schema, ownership constraints, grants, RLS, Auth initialization and financial audit. It has not been applied or tested. Authentication integration and persistence services remain pending. See `DATABASE.md` for the distinction between row constraints already authored and transactional business rules still required.
+Stage 2 database artifact: `supabase/migrations/20261029000100_initial_schema.sql` defines the initial schema, ownership constraints, grants, RLS, Auth initialization and financial audit. It has not been applied or tested. Frontend authentication is implemented; persistence services remain pending. See `DATABASE.md` for the distinction between row constraints already authored and transactional business rules still required.
 
 The Supabase React Router registry block has been installed with `@supabase/ssr`. Its browser entry at `src/lib/client.ts` is adapted to reuse the existing validated SPA singleton rather than creating a second cookie-backed client. The server helper at `src/lib/server.ts` is reserved for actual server loaders/actions and is not imported by the Vite browser application. Installing this helper does not enable SSR or authentication. User-provided public connection settings live only in ignored `.env.local`; connectivity and remote schema application have not been verified.
 
@@ -17,7 +17,7 @@ The Supabase React Router registry block has been installed with `@supabase/ssr`
 - `lib`: validadores, utilitários puros e integração Supabase.
 - `services`: infraestrutura compartilhada. Guardas de conectividade devem ser chamados antes de qualquer mutação futura.
 
-Nenhum gerenciador global de estado foi adicionado. TanStack Query usa cache em memória, retry de uma tentativa para leituras e zero para mutações. Mutações não são enfileiradas offline: `networkMode: always` exige validação de conectividade na operação. Ao implementar autenticação, limpar o QueryClient no logout/troca de usuário e incluir userId nas query keys.
+Nenhum gerenciador global de estado foi adicionado. TanStack Query usa cache em memória, retry de uma tentativa para leituras e zero para mutações. Mutações não são enfileiradas offline: `networkMode: always` exige validação de conectividade na operação. AuthProvider clears QueryClient on logout, identity changes and failed session validation. Future remote query keys must include userId.
 
 ## Design system
 
@@ -25,7 +25,7 @@ Tokens CSS em `_tokens.scss` definem cores, tipografia e espaçamento. `_primiti
 
 ## Fronteira de segurança
 
-Rotas atuais são públicas porque contêm apenas estrutura e documentação. **Não são rotas financeiras protegidas.** A Etapa 2 deve introduzir autenticação, proteção de rotas e RLS antes de expor dados. O cliente atual não persiste sessão. A escolha de persistência da sessão deverá ser revisada na Etapa 2. Configuração pública não prova que o backend esteja disponível. Segredos de Gemini ficam exclusivamente no backend.
+Only /login is public. RequireAuth waits for Supabase Auth user verification before rendering application routes. The SDK persists tokens in browser localStorage and refreshes them automatically. Financial records are not persisted locally. Client guards do not replace RLS; remote policy validation remains pending. See AUTH_SECURITY.md for details. Configuração pública não prova que o backend esteja disponível. Segredos de Gemini ficam exclusivamente no backend.
 
 ## PWA
 

@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useOnline } from '@/hooks/use-online';
 import { PwaStatus } from '@/components/shared/pwa-status';
+import { LogoutButton, useAuth } from '@/features/auth';
 
 const navigation = [
   { to: '/', label: 'Visão geral', icon: Grid2X2 },
@@ -35,6 +36,7 @@ export function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const online = useOnline();
   const navigationState = useNavigation();
+  const { user } = useAuth();
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
@@ -81,9 +83,14 @@ export function AppLayout() {
               <span className="status-dot" />
               Em desenvolvimento
             </span>
-            <span className="avatar" aria-label="Usuário não autenticado">
-              C
+            <span
+              className="avatar"
+              aria-label={`Conta de ${user?.email ?? 'usuário'}`}
+              title={user?.email}
+            >
+              {user?.email?.slice(0, 1).toUpperCase() ?? 'C'}
             </span>
+            <LogoutButton />
           </div>
         </header>
         <main

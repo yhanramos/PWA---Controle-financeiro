@@ -94,8 +94,8 @@ export function DashboardPage() {
         <div>
           <strong>O primeiro passo para uma rotina mais leve</strong>
           <p>
-            Fundação pronta. Conexão, autenticação e dados financeiros entram
-            nas próximas etapas.
+            Seu acesso está configurado. O registro e a consulta de dados
+            financeiros serão disponibilizados nas próximas etapas.
           </p>
         </div>
         <Button asChild variant="outline">

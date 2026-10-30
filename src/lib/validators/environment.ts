@@ -9,7 +9,11 @@ const schema = z.object({
         ['localhost', '127.0.0.1'].includes(url.hostname))
     );
   }),
-  publishableKey: z.string().min(20),
+  // Aceita somente a chave pública moderna; rejeita sb_secret e JWT service_role.
+  publishableKey: z
+    .string()
+    .min(20)
+    .regex(/^sb_publishable_[A-Za-z0-9_-]+$/),
 });
 
 export const environment = schema.safeParse({

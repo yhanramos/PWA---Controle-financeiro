@@ -1,11 +1,11 @@
 # Clareza — Controle financeiro pessoal
 
-PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Etapa 1 entregue; schema inicial da Etapa 2 disponível em SQL.** O script ainda não foi aplicado ao Supabase. Não existe autenticação integrada ao frontend, persistência financeira pela interface, cálculo de saldos ou IA operante nesta versão. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
+PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Etapa 1 entregue; schema inicial da Etapa 2 disponível em SQL.** O script ainda não foi aplicado ao Supabase. O login por e-mail/senha, a sessão e as rotas protegidas estão implementados no frontend. Persistência financeira pela interface, cálculo de saldos e IA ainda não estão implementados. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
 
 ## Pré-requisitos e instalação
 
 - Node.js 22.12+ (recomendado Node 24 LTS) e npm 10+.
-- Projeto Supabase para a próxima etapa. Para navegar pela fundação, as variáveis podem permanecer vazias.
+- Projeto Supabase para a próxima etapa. O acesso às rotas internas requer configuração válida e um usuário no Supabase Auth.
 
 ```sh
 npm install
@@ -20,7 +20,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sua-chave-publica
 
 Use a chave **publishable** disponibilizada no painel do Supabase. Nunca coloque chaves secretas ou `service_role` em variáveis `VITE_*`. O cliente só é criado se a configuração for válida; isso não verifica conectividade. A migration inicial está disponível conforme instruções abaixo. Reinicie o servidor após alterar variáveis.
 
-O bloco `@supabase/supabase-client-react-router` foi instalado pelo shadcn. O helper `src/lib/client.ts` reutiliza a instância existente em `src/lib/supabase/client.ts`, preservando a validação de ambiente e evitando múltiplos clientes de autenticação. O helper `src/lib/server.ts` é exclusivo para um futuro runtime de servidor; não é importado pela SPA e não cria um backend no Vite. A sessão permanece sem persistência até a implementação do fluxo de autenticação. Os valores locais fornecidos ficam em `.env.local`, ignorado pelo Git; `.env.example` permanece sem valores reais.
+O bloco `@supabase/supabase-client-react-router` foi instalado pelo shadcn. O helper `src/lib/client.ts` reutiliza a instância existente em `src/lib/supabase/client.ts`, preservando a validação de ambiente e evitando múltiplos clientes de autenticação. O helper `src/lib/server.ts` é exclusivo para um futuro runtime de servidor; não é importado pela SPA e não cria um backend no Vite. O SDK persiste a sessão no navegador; o aplicativo confirma o usuário no Auth antes de abrir as rotas internas. Os valores locais fornecidos ficam em `.env.local`, ignorado pelo Git; `.env.example` permanece sem valores reais.
 
 ```sh
 npm run dev
@@ -30,7 +30,7 @@ npm run dev
 
 React 19, TypeScript estrito, Vite 7, Tailwind 4, convenções shadcn/ui com Radix Slot e CVA, React Router 7, TanStack Query 5, Supabase JS, Lucide e SCSS. React Hook Form, Zod, Recharts, Vitest e React Testing Library estão preparados para as próximas etapas. O PWA usa vite-plugin-pwa e Workbox. Versões resolvidas são registradas no lockfile.
 
-Tailwind é processado em `src/styles/tailwind.css`, separado do Sass. Estilos de produto ficam em SCSS com herança via placeholders e `@extend`. Componentes UI são código local customizável; `components.json` configura o shadcn/ui. Formulários e gráficos financeiros ainda não foram criados.
+Tailwind é processado em `src/styles/tailwind.css`, separado do Sass. Estilos de produto ficam em SCSS com herança via placeholders e `@extend`. Componentes UI são código local customizável; `components.json` configura o shadcn/ui. O formulário de login usa React Hook Form e Zod; formulários e gráficos financeiros ainda não foram criados.
 
 ## Estrutura
 
@@ -62,7 +62,7 @@ npm run build
 npm run preview
 ```
 
-Os comandos de testes e build estão documentados para uso futuro, mas **não foram executados**, conforme instruções do projeto. Ainda não há casos Vitest; `npm run test` reportará ausência de testes até então. Casos SQL do schema foram escritos em `supabase/tests/initial_schema.sql`, separados da migration e ainda não executados.
+Os comandos de testes e build estão documentados para uso futuro, mas **não foram executados**, conforme instruções do projeto. Há casos Vitest de proteção de rotas e validação do login, ainda não executados. Casos SQL do schema foram escritos em `supabase/tests/initial_schema.sql`, separados da migration e ainda não executados.
 
 Na instalação, o Vitest foi atualizado para 4.1.12 para eliminar os alertas críticos/moderados da versão inicialmente selecionada. A auditoria restante reporta quatro avisos de baixa severidade na cadeia de desenvolvimento `vite-plugin-pwa → workbox-build → @rollup/plugin-node-resolve → deepmerge`. O registro consultado ainda não oferece uma versão corrigida de deepmerge; não foi aplicado downgrade incompatível sugerido por `audit fix --force`. Reavaliar antes do deploy.
 
@@ -74,7 +74,7 @@ Para criar as tabelas, abra **Supabase → SQL Editor → New query**, copie o c
 
 O script cria as 10 entidades previstas, `invoice_payments` para evitar dupla contagem de despesas e `financial_audit_log` para histórico de alterações, além de RLS, índices, constraints, perfil e categorias padrão por usuário. Leia [DATABASE.md](docs/DATABASE.md) para instruções, decisões e limites. A migration não foi executada localmente nem no seu Supabase.
 
-Continuam pendentes na Etapa 2: validar o schema aplicado, gerar tipos, integrar autenticação e criar serviços. Regras financeiras atômicas entram na Etapa 3. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
+Continuam pendentes na Etapa 2: validar o schema aplicado, gerar tipos e criar serviços de persistência. A autenticação do frontend foi integrada e o usuário confirmou que o login funcionou em 30/10/2026. Regras financeiras atômicas entram na Etapa 3. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
 
 Na Etapa 5, configurar `GEMINI_API_KEY` em Supabase Secrets e implementar `financial-assistant`. O frontend enviará chamadas autenticadas à Edge Function; não falará diretamente com Gemini. O placeholder de chave em `.env.example` é apenas documentação, não é utilizado pelo frontend.
 
@@ -87,3 +87,7 @@ O service worker fica desativado no desenvolvimento. Após validação autorizad
 ## Próximo passo
 
 Executar a **Etapa 2 — Banco e autenticação**, conforme [roadmap](docs/ROADMAP.md). Consulte [arquitetura](docs/ARCHITECTURE.md), [banco](docs/DATABASE.md), [regras financeiras](docs/FINANCIAL_RULES.md) e [IA](docs/AI_INTEGRATION.md).
+
+## Login local e segurança
+
+Acesse /login usando uma conta já cadastrada e confirmada no Supabase Auth. O cadastro público e a recuperação de senha ainda não estão implementados. Para criar o primeiro usuário e entender os quatro níveis de segurança, consulte [AUTH_SECURITY.md](docs/AUTH_SECURITY.md). O botão Sair encerra a sessão atual e limpa o cache em memória. O usuário confirmou o funcionamento do login em 30/10/2026; os testes automatizados e a validação do RLS continuam pendentes.

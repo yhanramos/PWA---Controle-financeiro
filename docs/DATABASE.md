@@ -70,7 +70,7 @@ New Auth users receive a profile and 14 per-user default categories: ten expense
 
 ## Explicit limits and next steps
 
-- Auth UI, protected routes, generated TypeScript types and persistence services remain pending.
+- Auth UI and protected routes are implemented; the user confirmed real login on 2026-10-30. Database policy verification, generated database types and persistence services remain pending.
 - Atomic creation of full installment schedules and recurrence generation are not implemented. Row checks do not prove a schedule is complete.
 - No RPC yet enforces aggregate invoice balance, overpayment rejection, closed/cancelled invoice writes, account opening-date cutoffs, cancellation propagation or atomic early settlement. Do not enable those workflows until transactional operations and concurrency rules are implemented.
 - Do not use direct client multi-row writes for workflows requiring all-or-nothing consistency. Invoice payments must not be mirrored as expense transactions by services.
