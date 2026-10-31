@@ -20,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { useOnline } from '@/hooks/use-online';
 import { PwaStatus } from '@/components/shared/pwa-status';
 import { LogoutButton, useAuth } from '@/features/auth';
+import { useProfile } from '@/features/profile';
 
 const navigation = [
   { to: '/', label: 'Visão geral', icon: Grid2X2 },
@@ -37,6 +38,8 @@ export function AppLayout() {
   const online = useOnline();
   const navigationState = useNavigation();
   const { user } = useAuth();
+  const { data: profile } = useProfile();
+  const accountName = profile?.display_name || user?.email || 'Usuário';
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main">
@@ -85,10 +88,10 @@ export function AppLayout() {
             </span>
             <span
               className="avatar"
-              aria-label={`Conta de ${user?.email ?? 'usuário'}`}
-              title={user?.email}
+              aria-label={`Conta de ${accountName}`}
+              title={accountName}
             >
-              {user?.email?.slice(0, 1).toUpperCase() ?? 'C'}
+              {accountName.slice(0, 1).toUpperCase()}
             </span>
             <LogoutButton />
           </div>

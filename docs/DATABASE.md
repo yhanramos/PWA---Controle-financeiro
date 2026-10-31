@@ -1,6 +1,6 @@
 # Database — initial schema
 
-The first migration is `supabase/migrations/20261029000100_initial_schema.sql`. It has **not been applied to a remote Supabase project or executed locally**. This is the database portion of Stage 2, not completed authentication or financial services.
+The first migration is `supabase/migrations/20261029000100_initial_schema.sql`. The user confirmed applying it to Supabase on 2026-10-30. The remote schema was introspected with the official CLI and security metadata was inspected read-only. Behavioral tests have not run. See PERSISTENCE.md for evidence and the implemented profile/category services.
 
 ## Installation in Supabase
 
@@ -70,7 +70,7 @@ New Auth users receive a profile and 14 per-user default categories: ten expense
 
 ## Explicit limits and next steps
 
-- Auth UI and protected routes are implemented; the user confirmed real login on 2026-10-30. Database policy verification, generated database types and persistence services remain pending.
+- Auth UI and protected routes are implemented; the user confirmed real login on 2026-10-30. Official database types, profile read/update services and category reads are implemented. Policy configuration was inspected; two-user behavioral isolation remains untested.
 - Atomic creation of full installment schedules and recurrence generation are not implemented. Row checks do not prove a schedule is complete.
 - No RPC yet enforces aggregate invoice balance, overpayment rejection, closed/cancelled invoice writes, account opening-date cutoffs, cancellation propagation or atomic early settlement. Do not enable those workflows until transactional operations and concurrency rules are implemented.
 - Do not use direct client multi-row writes for workflows requiring all-or-nothing consistency. Invoice payments must not be mirrored as expense transactions by services.

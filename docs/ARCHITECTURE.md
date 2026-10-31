@@ -4,9 +4,9 @@
 
 Etapa 1 implementada: aplicação client-side React/TypeScript/Vite; arquitetura por funcionalidades; layout mobile-first; rotas com carregamento sob demanda; infraestrutura de query, validação, PWA e cliente Supabase opcional. O dashboard inicial usa placeholders explícitos, sem séries inventadas. O seletor de mês usa calendário em UTC para aritmética e obtém o mês atual em America/Sao_Paulo.
 
-Stage 2 database artifact: `supabase/migrations/20261029000100_initial_schema.sql` defines the initial schema, ownership constraints, grants, RLS, Auth initialization and financial audit. It has not been applied or tested. Frontend authentication is implemented; persistence services remain pending. See `DATABASE.md` for the distinction between row constraints already authored and transactional business rules still required.
+Stage 2 database artifact: `supabase/migrations/20261029000100_initial_schema.sql` defines the initial schema, ownership constraints, grants, RLS, Auth initialization and financial audit. The user confirmed application; official remote types and read-only catalog inspection confirm the expected tables and security configuration. Behavioral tests remain pending. Profile persistence and category read services are implemented. See `DATABASE.md` for the distinction between row constraints already authored and transactional business rules still required.
 
-The Supabase React Router registry block has been installed with `@supabase/ssr`. Its browser entry at `src/lib/client.ts` is adapted to reuse the existing validated SPA singleton rather than creating a second cookie-backed client. The server helper at `src/lib/server.ts` is reserved for actual server loaders/actions and is not imported by the Vite browser application. Installing this helper does not enable SSR or authentication. User-provided public connection settings live only in ignored `.env.local`; connectivity and remote schema application have not been verified.
+The Supabase React Router registry block has been installed with `@supabase/ssr`. Its browser entry at `src/lib/client.ts` is adapted to reuse the existing validated SPA singleton rather than creating a second cookie-backed client. The server helper at `src/lib/server.ts` is reserved for actual server loaders/actions and is not imported by the Vite browser application. Installing this helper does not enable SSR or authentication. User-provided public connection settings live only in ignored `.env.local`; the remote schema and RLS configuration have been inspected via authenticated CLI; behavioral RLS tests remain pending.
 
 ## Responsabilidades
 
@@ -17,7 +17,7 @@ The Supabase React Router registry block has been installed with `@supabase/ssr`
 - `lib`: validadores, utilitários puros e integração Supabase.
 - `services`: infraestrutura compartilhada. Guardas de conectividade devem ser chamados antes de qualquer mutação futura.
 
-Nenhum gerenciador global de estado foi adicionado. TanStack Query usa cache em memória, retry de uma tentativa para leituras e zero para mutações. Mutações não são enfileiradas offline: `networkMode: always` exige validação de conectividade na operação. AuthProvider clears QueryClient on logout, identity changes and failed session validation. Future remote query keys must include userId.
+Nenhum gerenciador global de estado foi adicionado. TanStack Query usa cache em memória, retry de uma tentativa para leituras e zero para mutações. Mutações não são enfileiradas offline: `networkMode: always` exige validação de conectividade na operação. AuthProvider clears QueryClient on logout, identity changes and failed session validation. Profile/category query keys include userId and reads propagate abort signals. A per-operation data client captures the current JWT and rejects stale user IDs. See PERSISTENCE.md.
 
 ## Design system
 

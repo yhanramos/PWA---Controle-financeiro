@@ -2,6 +2,7 @@ import { Check, CircleDashed, ShieldCheck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/features/auth';
+import { ProfilePanel } from '@/features/profile';
 
 export function SettingsPage() {
   const { user } = useAuth();
@@ -12,6 +13,7 @@ export function SettingsPage() {
         <h1>Configurações</h1>
         <p>O status da fundação, sem atalhos para os seus dados.</p>
       </header>
+      <ProfilePanel />
       <Card className="settings-panel">
         <ShieldCheck size={28} />
         <h2>Conexão com o Supabase</h2>
@@ -52,7 +54,7 @@ export function SettingsPage() {
           </li>
           <li>
             <CircleDashed size={18} />
-            Aplicação e validação do banco e RLS · Etapa 2
+            Validação do isolamento entre usuários · pendente
           </li>
           <li>
             <CircleDashed size={18} />

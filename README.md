@@ -1,6 +1,6 @@
 # Clareza — Controle financeiro pessoal
 
-PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Etapa 1 entregue; schema inicial da Etapa 2 disponível em SQL.** O script ainda não foi aplicado ao Supabase. O login por e-mail/senha, a sessão e as rotas protegidas estão implementados no frontend. Persistência financeira pela interface, cálculo de saldos e IA ainda não estão implementados. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
+PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Etapa 1 entregue; base da Etapa 2 integrada ao Supabase.** O usuário confirmou a aplicação do SQL e os metadados remotos foram inspecionados em 30/10/2026. O login por e-mail/senha, a sessão e as rotas protegidas estão implementados no frontend. Persistência financeira pela interface, cálculo de saldos e IA ainda não estão implementados. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
 
 ## Pré-requisitos e instalação
 
@@ -72,9 +72,9 @@ O Node padrão encontrado nesta máquina é 14 e não atende ao projeto. A insta
 
 Para criar as tabelas, abra **Supabase → SQL Editor → New query**, copie o conteúdo completo de [`20261029000100_initial_schema.sql`](supabase/migrations/20261029000100_initial_schema.sql) e execute como `postgres`. É um script de primeira instalação, para executar uma única vez em projeto sem estas tabelas. Não exige inserir chaves no SQL. Se já houver tabelas da aplicação, compare o schema antes de aplicar; não remova tabelas para forçar a execução.
 
-O script cria as 10 entidades previstas, `invoice_payments` para evitar dupla contagem de despesas e `financial_audit_log` para histórico de alterações, além de RLS, índices, constraints, perfil e categorias padrão por usuário. Leia [DATABASE.md](docs/DATABASE.md) para instruções, decisões e limites. A migration não foi executada localmente nem no seu Supabase.
+O script cria as 10 entidades previstas, `invoice_payments` para evitar dupla contagem de despesas e `financial_audit_log` para histórico de alterações, além de RLS, índices, constraints, perfil e categorias padrão por usuário. Leia [DATABASE.md](docs/DATABASE.md) para instruções, decisões e limites. O usuário aplicou esta migration no Supabase. As 12 tabelas, RLS, políticas e permissões foram inspecionadas por leitura de metadados; não reaplique o script inicial.
 
-Continuam pendentes na Etapa 2: validar o schema aplicado, gerar tipos e criar serviços de persistência. A autenticação do frontend foi integrada e o usuário confirmou que o login funcionou em 30/10/2026. Regras financeiras atômicas entram na Etapa 3. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
+Os tipos oficiais foram gerados do schema remoto. Perfil com edição do nome e consulta das categorias reais já usam serviços tipados e TanStack Query. Continua pendente a validação comportamental do RLS entre dois usuários. A autenticação do frontend foi integrada e o usuário confirmou que o login funcionou em 30/10/2026. Regras financeiras atômicas entram na Etapa 3. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
 
 Na Etapa 5, configurar `GEMINI_API_KEY` em Supabase Secrets e implementar `financial-assistant`. O frontend enviará chamadas autenticadas à Edge Function; não falará diretamente com Gemini. O placeholder de chave em `.env.example` é apenas documentação, não é utilizado pelo frontend.
 
@@ -86,8 +86,10 @@ O service worker fica desativado no desenvolvimento. Após validação autorizad
 
 ## Próximo passo
 
+Em **Configurações → Seu perfil**, é possível carregar e salvar seu nome no Supabase. A tela **Categorias** consulta os registros reais da conta e separa receitas/despesas. Os tipos oficiais e a inspeção remota estão documentados em [PERSISTENCE.md](docs/PERSISTENCE.md). Nenhuma alteração de perfil ou dado financeiro foi feita no banco durante esta implementação.
+
 Executar a **Etapa 2 — Banco e autenticação**, conforme [roadmap](docs/ROADMAP.md). Consulte [arquitetura](docs/ARCHITECTURE.md), [banco](docs/DATABASE.md), [regras financeiras](docs/FINANCIAL_RULES.md) e [IA](docs/AI_INTEGRATION.md).
 
 ## Login local e segurança
 
-Acesse /login usando uma conta já cadastrada e confirmada no Supabase Auth. O cadastro público e a recuperação de senha ainda não estão implementados. Para criar o primeiro usuário e entender os quatro níveis de segurança, consulte [AUTH_SECURITY.md](docs/AUTH_SECURITY.md). O botão Sair encerra a sessão atual e limpa o cache em memória. O usuário confirmou o funcionamento do login em 30/10/2026; os testes automatizados e a validação do RLS continuam pendentes.
+Acesse /login usando uma conta já cadastrada e confirmada no Supabase Auth. O cadastro público e a recuperação de senha ainda não estão implementados. Para criar o primeiro usuário e entender os quatro níveis de segurança, consulte [AUTH_SECURITY.md](docs/AUTH_SECURITY.md). O botão Sair encerra a sessão atual e limpa o cache em memória. O usuário confirmou o funcionamento do login em 30/10/2026; os testes automatizados e a validação comportamental do RLS continuam pendentes. A configuração das políticas no banco foi inspecionada por leitura de metadados.

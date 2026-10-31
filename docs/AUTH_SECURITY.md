@@ -17,7 +17,7 @@ Logout uses `scope: local`: it signs out the current session, not all other devi
 | Layer                                | Current implementation                                                                           | Remaining work                                                                                                                 |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
 | Credentials outside Git              | `.env.local` ignored; `.env.example` empty; Supabase temporary directories ignored               | Store future backend secrets in Supabase Secrets / deployment secret settings                                                  |
-| RLS in the database                  | Initial SQL contains user-scoped policies and ownership foreign keys                             | Apply migration and verify isolation with two accounts; not executed here                                                      |
+| RLS in the database                  | Remote tables, ownership policies and grants inspected read-only on 2026-10-30                   | Verify behavioral isolation with two accounts; not executed here                                                               |
 | Backend authorization and validation | Supabase Auth verifies login; SQL defines constraints and policies                               | Implement financial RPCs/Edge Functions validating JWT, input, ownership, idempotency and confirmations before enabling writes |
 | Public versus privileged access      | Browser env validation accepts only modern `sb_publishable_` keys; no privileged key is required | Keep service-role/secret/Gemini keys exclusively server-side; never trust a model or client-supplied user_id                   |
 
@@ -30,12 +30,12 @@ The folder `supabase/` contains versioned source and is safe to track when it ha
 3. Create the initial account through **Authentication → Users → Add user**, with an email/password you control; use a confirmed email for this initial manually managed account. No account is created by this implementation.
 4. Open `/login` and enter those credentials. A successful Auth session redirects to the intended internal page.
 
-The Auth account exists independently of application tables. Applying the initial SQL creates/backfills its profile and default categories. This implementation does not query the profile or financial tables yet, so a successful login does not prove the migration was applied.
+The Auth account exists independently of application tables. Applying the initial SQL creates/backfills its profile and default categories. The application now reads the user profile and categories and can update display_name. Login alone does not prove database authorization; remote RLS metadata was separately inspected, and behavioral isolation remains untested.
 
 In a single-user deployment, disable public signups in Supabase if you do not want additional registrations. Hiding a signup form does not disable the Auth API. Do not change remote configuration without an explicit deployment decision.
 
 ## Verification status
 
-TypeScript and ESLint were checked locally during implementation. The user confirmed successful real login on 2026-10-30. Regression cases for route gating and input validation are authored but not executed. No build, test command, RLS access test or production deployment was run. Recovery, signup UI, MFA, profile integration and financial persistence remain outside this change. Successful login does not validate database policies or all session lifecycle scenarios.
+TypeScript and ESLint were checked locally during implementation. The user confirmed successful real login on 2026-10-30. Regression cases for route gating and input validation are authored but not executed. No build, test command, RLS access test or production deployment was run. Recovery, signup UI, MFA and financial transaction persistence remain outside this change. Profile integration and category reads are now implemented; see PERSISTENCE.md. Successful login does not validate database policies or all session lifecycle scenarios.
 
 References: [password login](https://supabase.com/docs/reference/javascript/auth-signinwithpassword), [auth events](https://supabase.com/docs/reference/javascript/auth-onauthstatechange), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security).

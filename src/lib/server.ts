@@ -3,6 +3,7 @@ import {
   parseCookieHeader,
   serializeCookieHeader,
 } from '@supabase/ssr';
+import type { Database } from './supabase/database.types';
 
 // Apenas para um futuro runtime de servidor. Não importar em componentes da SPA.
 export function createClient(request: Request) {
@@ -13,7 +14,7 @@ export function createClient(request: Request) {
   }
   const headers = new Headers();
 
-  const supabase = createServerClient(url, key, {
+  const supabase = createServerClient<Database>(url, key, {
     cookies: {
       getAll() {
         return parseCookieHeader(request.headers.get('Cookie') ?? '').flatMap(
