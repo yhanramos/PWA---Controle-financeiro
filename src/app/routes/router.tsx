@@ -24,6 +24,28 @@ export const router = createBrowserRouter([
         children: [
           { index: true, Component: DashboardPage },
           {
+            path: 'compras-credito',
+            lazy: async () => ({
+              Component: (
+                await import('@/features/transactions/credit-purchases-page')
+              ).CreditPurchasesPage,
+            }),
+          },
+          {
+            path: 'faturas',
+            lazy: async () => ({
+              Component: (await import('@/features/invoices/invoices-page'))
+                .InvoicesPage,
+            }),
+          },
+          {
+            path: 'contas',
+            lazy: async () => ({
+              Component: (await import('@/features/accounts/accounts-page'))
+                .AccountsPage,
+            }),
+          },
+          {
             path: 'cartoes',
             lazy: async () => ({
               Component: (await import('@/features/cards/cards-page'))

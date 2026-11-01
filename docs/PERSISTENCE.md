@@ -51,3 +51,7 @@ if ($source -notmatch 'export type Database') { throw 'Unexpected CLI output.' }
 Review changes after every applied migration. The project reference is public metadata, not a credential. The existing migration was applied manually, so reconcile migration history before using CLI db push; do not blindly apply the initial migration again.
 
 Reference: [Supabase generated types](https://supabase.com/docs/guides/api/rest/generating-types).
+
+## Etapa 3 — atualização de 2026-11-01
+
+Usuário confirmou aplicação bem-sucedida do pacote SQL. Tipos oficiais regenerados remotamente, incluindo os RPCs financeiros. Cadastro, edição via RPC e desativação de categoria foram validados no navegador na segunda conta, com persistência após recarregar. Ainda não houve validação dos fluxos financeiros nesta rodada. Não reaplicar o pacote.

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { supabase } from './client';
-import type { Database } from './database.types';
+import type { AppDatabase } from './migration.types';
 import { environment } from '@/lib/validators/environment';
 import { DataError } from '@/services/data-error';
 
@@ -27,7 +27,7 @@ export async function userClient(expectedUserId: string, signal?: AbortSignal) {
       'Sua sessão mudou. Entre novamente para continuar.',
     );
   // Cada leitura/escrita remota ainda é autorizada pelo JWT e pelo RLS do Supabase.
-  const client = createClient<Database>(
+  const client = createClient<AppDatabase>(
     environment.data.url,
     environment.data.publishableKey,
     {

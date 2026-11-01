@@ -749,7 +749,84 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      anticipate_installment_plan: {
+        Args: {
+          p_account: string;
+          p_date: string;
+          p_discount: number;
+          p_invoice: string;
+          p_key: string;
+          p_plan: string;
+        };
+        Returns: string;
+      };
+      cancel_installment_plan: {
+        Args: { p_plan: string; p_version: string };
+        Returns: string;
+      };
+      create_credit_purchase: {
+        Args: {
+          p_amount: number;
+          p_card: string;
+          p_category: string;
+          p_date: string;
+          p_description: string;
+          p_key: string;
+          p_month?: string;
+        };
+        Returns: string;
+      };
+      create_installment_plan: {
+        Args: { p_input: Json; p_key: string };
+        Returns: string;
+      };
+      edit_financial_record: {
+        Args: {
+          p_changes: Json;
+          p_id: string;
+          p_table: string;
+          p_version: string;
+        };
+        Returns: string;
+      };
+      edit_installment_plan: {
+        Args: {
+          p_description: string;
+          p_notes: string;
+          p_plan: string;
+          p_version: string;
+        };
+        Returns: string;
+      };
+      generate_recurrences: {
+        Args: { p_rule: string; p_until: string };
+        Returns: number;
+      };
+      pay_invoice: {
+        Args: {
+          p_account: string;
+          p_amount: number;
+          p_date: string;
+          p_invoice: string;
+          p_key: string;
+        };
+        Returns: string;
+      };
+      reverse_invoice_payment: {
+        Args: { p_payment: string; p_reason: string };
+        Returns: string;
+      };
+      update_recurrence: {
+        Args: {
+          p_active: boolean;
+          p_amount: number;
+          p_description: string;
+          p_end: string;
+          p_rule: string;
+          p_version: string;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       [_ in never]: never;

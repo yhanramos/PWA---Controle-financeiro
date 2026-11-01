@@ -1,22 +1,57 @@
 import { useState } from 'react';
 import { Tags } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { DataState } from '@/components/shared/data-state';
-import { dataErrorMessage } from '@/services/data-error';
+import { z } from 'zod';
+import {
+  FinancialWorkspace,
+  type Field,
+} from '@/features/shared/financial-workspace';
+import { RecordEditor } from '@/features/shared/record-editor';
+import { useCreateFinancialRow } from '@/features/shared/financial-data';
 import { useCategories } from './hooks/use-categories';
-
+import { DataState } from '@/components/shared/data-state';
+import { Button } from '@/components/ui/button';
+import { dataErrorMessage } from '@/services/data-error';
+const schema = z.object({
+  name: z.string().trim().min(1).max(80),
+  kind: z.enum(['income', 'expense']),
+  color: z.string().regex(/^#[0-9a-f]{6}$/i, 'Informe uma cor como #8073f5.'),
+});
+const fields: Field[] = [
+  { name: 'name', label: 'Nome', required: true },
+  {
+    name: 'kind',
+    label: 'Tipo',
+    kind: 'select',
+    required: true,
+    options: [
+      { value: 'income', label: 'Receita' },
+      { value: 'expense', label: 'Despesa' },
+    ],
+  },
+  {
+    name: 'color',
+    label: 'Cor hexadecimal',
+    placeholder: '#8073f5',
+    required: true,
+  },
+];
 export function CategoriesPage() {
-  const [kind, setKind] = useState<'expense' | 'income'>('expense');
   const query = useCategories();
-  const categories = query.data?.filter((category) => category.kind === kind);
+  const save = useCreateFinancialRow('categories');
+  const [kind, setKind] = useState('expense');
+  if (query.isError)
+    return (
+      <DataState
+        title="Não foi possível carregar categorias"
+        error
+        description={dataErrorMessage(query.error)}
+        onRetry={() => void query.refetch()}
+      />
+    );
+  if (!query.data) return <DataState title="Carregando categorias…" loading />;
+  const rows = query.data.filter((r) => r.kind === kind);
   return (
     <div className="page-stack">
-      <header className="page-heading">
-        <span className="eyebrow">CADA VALOR NO SEU LUGAR</span>
-        <h1>Categorias</h1>
-        <p>Consulte as categorias cadastradas na sua conta.</p>
-      </header>
       <div
         className="category-filters"
         role="group"
@@ -37,42 +72,26 @@ export function CategoriesPage() {
           Receitas
         </Button>
       </div>
-      {query.isPending ? (
-        <DataState title="Carregando suas categorias…" loading />
-      ) : query.isError ? (
-        <DataState
-          title="Não foi possível carregar as categorias"
-          error
-          description={dataErrorMessage(query.error)}
-          onRetry={() => void query.refetch()}
-        />
-      ) : !categories?.length ? (
-        <DataState
-          title="Nenhuma categoria encontrada"
-          description="Sua conta ainda não possui categorias deste tipo."
-        />
-      ) : (
-        <ul className="category-grid">
-          {categories.map((category) => (
-            <li key={category.id}>
-              <Card className="category-card">
-                <span
-                  className="category-swatch"
-                  style={{ backgroundColor: category.color }}
-                  aria-hidden="true"
-                />
-                <Tags size={18} aria-hidden="true" />
-                <h2>{category.name}</h2>
-                {!category.is_active && <span className="badge">Inativa</span>}
-              </Card>
-            </li>
-          ))}
-        </ul>
-      )}
-      <p className="page-footnote">
-        O cadastro e a edição de categorias estarão disponíveis na etapa de
-        organização financeira.
-      </p>
+      <FinancialWorkspace
+        title="Categorias"
+        eyebrow="CADA VALOR NO SEU LUGAR"
+        description="Cadastre e organize as categorias dos seus lançamentos."
+        action="Nova categoria"
+        icon={<Tags />}
+        fields={fields}
+        onSave={async (values) => {
+          await save.mutateAsync(schema.parse(values));
+        }}
+        rows={rows.map((r) => ({
+          title: r.name,
+          detail: r.is_active ? 'Ativa' : 'Inativa',
+          value: r.color,
+        }))}
+        note="Desativar uma categoria preserva o histórico. O tipo é mantido para não alterar a natureza dos lançamentos existentes."
+      />
+      {rows.map((row) => (
+        <RecordEditor key={row.id} table="categories" row={row} />
+      ))}
     </div>
   );
 }
