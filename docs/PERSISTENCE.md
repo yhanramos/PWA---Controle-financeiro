@@ -55,3 +55,5 @@ Reference: [Supabase generated types](https://supabase.com/docs/guides/api/rest/
 ## Etapa 3 — atualização de 2026-11-01
 
 Usuário confirmou aplicação bem-sucedida do pacote SQL. Tipos oficiais regenerados remotamente, incluindo os RPCs financeiros. Cadastro, edição via RPC e desativação de categoria foram validados no navegador na segunda conta, com persistência após recarregar. Ainda não houve validação dos fluxos financeiros nesta rodada. Não reaplicar o pacote.
+
+Rodada posterior de 01/11/2026: fluxos financeiros principais validados pela interface na segunda conta, incluindo pagamentos/estornos, crédito, parcelamentos, antecipação, recorrências e edição dos cadastros. Consulte [STAGE3_VALIDATION.md](STAGE3_VALIDATION.md) para resultados e limites. Nenhuma correção SQL foi necessária; não reaplicar o pacote existente.

@@ -1,5 +1,31 @@
 # Regras financeiras — contrato para implementação
 
+## Etapa 4, fase 4 — projeção (2026-11-02)
+
+Projeção = caixa atual até hoje + receitas pendentes − despesas pendentes fora do crédito − saldo em aberto das faturas, considerando todos os vencimentos até o último dia do mês selecionado, inclusive atrasados e meses intermediários. O saldo das faturas já desconta pagamentos confirmados e descontos de parcelas; pagamentos estornados não liquidam obrigações. Não deduzir novamente parcelas/compras separadamente das faturas. Contas e cartões inativos preservam os compromissos existentes. Saldo negativo é válido.
+
+A referência é hoje em America/Sao_Paulo. Meses anteriores exibem projeção não aplicável, sem estimativa histórica fabricada. Recorrências não geradas, novas compras e saldos iniciais futuros não compõem a estimativa. A tela explicita essas limitações e os atrasados incluídos; valores são condicionais ao recebimento/pagamento dos compromissos registrados. Consultas autenticadas/paginadas e cálculo em BigInt seguem as fases anteriores; não há snapshot transacional entre tabelas.
+
+## Etapa 4, fase 3 — gráficos (2026-11-02)
+
+Evolução financeira: seis meses terminando no mês selecionado, com receitas/despesas fora do crédito liquidadas pela data efetiva e pagamentos de fatura confirmados pela data do pagamento, até hoje em America/Sao_Paulo. Não inclui saldo inicial, previsões, compras no crédito ou pagamentos estornados. Meses futuros não são projeções. Estado atual corrigido dos registros, não reconstrução histórica da auditoria.
+
+Categorias: despesas não canceladas (previstas/liquidadas fora do crédito e compras lançadas no crédito) pelo mês de ocorrência, mais parcelas ativas de planos ativos pelo competence_month original, deduzindo descontos. Excluir itens de faturas canceladas e nunca adicionar pagamentos de fatura. Antecipação preserva competência; parcelas históricas não importadas não são inventadas. Categorias inativas mantêm o histórico. Os valores de competência podem diferir do caixa e do total por vencimento. Totais em centavos/BigInt e validação de faixa segura precedem a apresentação. Leituras paginadas com RLS; sem snapshot transacional entre tabelas.
+
+## Etapa 4, fase 2 — indicadores mensais (2026-11-02)
+
+Indicadores filtrados pelo mês de vencimento, usando o estado atual dos registros (inclusive ao consultar meses passados). Receitas previstas somam apenas receitas pendentes fora do crédito; despesas pendentes somam apenas despesas pendentes fora do crédito. Atrasados aparecem no mês original de vencimento. Regras recorrentes ainda não geradas não entram nos totais.
+
+Total das faturas soma compras lançadas e parcelas ativas de planos ativos nas faturas não canceladas que vencem no mês, menos descontos. Inclui faturas já pagas; o valor em aberto é mostrado separadamente, deduzindo pagamentos confirmados (estornados não deduzem). Parcelas antecipadas seguem a fatura de destino. Não somar faturas às despesas fora do crédito neste card. Cadastros inativos preservam seus compromissos. Zero sem registros é distinto de falha de consulta. Leituras paginadas por usuário, BigInt e limites seguros seguem a fase 1; não constituem snapshot transacional nem reconstrução histórica por auditoria.
+
+## Etapa 4, fase 1 — saldo atual (2026-11-02)
+
+O saldo atual acumula saldos iniciais com data até hoje, mais receitas liquidadas, menos despesas liquidadas fora do crédito e pagamentos de fatura confirmados, usando as datas efetivas até hoje em America/Sao_Paulo. Cancelados, previstos, compras/parcelas no crédito e pagamentos estornados não movimentam esse total. Contas inativas continuam incluídas: desativar um cadastro não apaga dinheiro nem histórico. Saldo negativo é permitido.
+
+Esta fase exibe a posição atual corrigida e identificada pela data, independente do seletor mensal. Não reconstrói o que era conhecido antes de um estorno/cancelamento passado; o filtro histórico exige política temporal e auditoria na fase 6. Todas as contas (inclusive sem movimento e inativas) contribuem a partir da data do saldo inicial. Sem contas elegíveis, exibir zero com convite de cadastro; falha de leitura/validação exibe indisponibilidade, nunca zero fictício.
+
+Leituras autenticadas e paginadas usam RLS e filtro de proprietário; valores são validados como centavos inteiros seguros, somados com BigInt e verificados antes da apresentação. O cartão inclui composição acumulada e nova consulta após mutações, retorno à tela/foco e a cada minuto enquanto visível. As três leituras não representam um snapshot transacional; concorrência externa pode produzir uma visão transitória até a atualização seguinte. Casos de domínio foram escritos em `cash-balance.test.ts`, sem execução conforme restrição vigente.
+
 As regras abaixo orientam a Etapa 3; **os fluxos financeiros ainda não estão implementados**. A migration inicial define a representação de dados e algumas constraints/triggers, mas ainda não foi aplicada nem executada.
 
 ## Initial schema decisions

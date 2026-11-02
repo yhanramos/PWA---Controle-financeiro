@@ -1,6 +1,6 @@
 # Clareza — Controle financeiro pessoal
 
-PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. **Etapa 1 entregue; base da Etapa 2 integrada ao Supabase.** O usuário confirmou a aplicação do SQL e os metadados remotos foram inspecionados em 30/10/2026. O login por e-mail/senha, a sessão e as rotas protegidas estão implementados no frontend. Persistência financeira pela interface, cálculo de saldos e IA ainda não estão implementados. As telas identificam o estágio de implementação; nenhum valor demonstrativo é apresentado como real.
+PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. Etapas 1 a 3 entregues, com validação manual dos fluxos financeiros registrada em docs/STAGE3_VALIDATION.md. Etapa 4 em andamento: o saldo de caixa atual já consulta dados reais, com composição, estornos e estados de carregamento/erro. Indicadores mensais de receitas previstas, despesas pendentes fora do crédito e total/em aberto das faturas já consultam registros reais pelo mês de vencimento. Gráficos Recharts de evolução do caixa e despesas por categoria estão integrados ao mês selecionado. Projeção financeira até o fim do mês selecionado implementada, com composição e atrasados. Próximos vencimentos e revisão integrada dos filtros continuam pendentes. IA ainda não implementada. Nenhum valor demonstrativo é apresentado como real.
 
 ## Pré-requisitos e instalação
 

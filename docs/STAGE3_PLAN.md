@@ -80,3 +80,7 @@ Esta confirmação supera as notas históricas de migration não aplicada. Não 
 Na segunda conta de teste, foram confirmados pelo navegador: cadastro da conta QA Financeiro 01-11 com saldo inicial de R$ 1.000,00; criação de receita de R$ 123,45, edição para R$ 124,46 e cancelamento; cadastro do cartão QA Cartão 01-11. A compra QA Crédito 01-11 foi submetida, mas sua confirmação não foi observada antes da solicitação de commit. Os registros de validação foram preservados para auditoria.
 
 Permanecem pendentes: conclusão da validação de crédito, pagamentos e estornos de faturas, despesas, parcelamentos, antecipação e recorrências. Este commit não representa validação integral da Etapa 3. Build e testes automatizados não foram executados.
+
+## Encerramento da rodada funcional — 2026-11-01
+
+Os fluxos pendentes da rodada anterior foram validados manualmente no navegador: crédito, pagamento parcial, rejeição de excesso, bloqueio de cancelamento com pagamento, estorno, parcelamentos, histórico, antecipação com desconto, despesas, recorrências com e sem crédito, edição e ativação/desativação de contas e cartões. Evidências e limites em [STAGE3_VALIDATION.md](STAGE3_VALIDATION.md). Registros QA cancelados/encerrados e pagamentos estornados; faturas zeradas; conta com saldo inicial zerado e conta/cartão inativos. Próxima etapa de desenvolvimento: dashboard (Etapa 4). Nenhum build ou teste automatizado executado.

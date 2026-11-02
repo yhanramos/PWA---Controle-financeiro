@@ -134,7 +134,7 @@ export function useCreateFinancialRow(
     },
     onSuccess: () => {
       requestId.current = crypto.randomUUID();
-      return qc.invalidateQueries({ queryKey: ['users', user?.id, table] });
+      return qc.invalidateQueries({ queryKey: ['users', user?.id] });
     },
   });
 }
