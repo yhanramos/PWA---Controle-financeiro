@@ -63,6 +63,8 @@ Fase 1 reutiliza as tabelas existentes; nenhuma migration adicional. Casos de c�
 
 ## Etapa 5 — Inteligência artificial
 
+Fase 1 em código (06/11/2026): chat com histórico, Edge Function autenticada, Gemini como classificador estruturado, ferramenta de consulta financeira por vencimento, reservas idempotentes e limites persistidos. Migration e implantação ainda pendentes; nenhum secret cadastrado, SQL executado ou chamada real ao provedor. Escritas com confirmação, consultas por cartão e validação integrada continuam pendentes. Detalhes em [AI_INTEGRATION.md](AI_INTEGRATION.md). Não considerar a Etapa 5 concluída.
+
 Edge Function autenticada, Gemini, ferramentas autorizadas, schemas, limites de uso, idempotência, confirmações e chat persistente.
 
 ## Etapa 6 — Validação e deploy
