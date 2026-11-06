@@ -1,10 +1,11 @@
-import { Link } from 'react-router';
-import { Check, CircleDashed, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Check, CircleDashed, ShieldCheck } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase/client';
+import { useAuth } from '@/features/auth';
+import { ProfilePanel } from '@/features/profile';
 
 export function SettingsPage() {
+  const { user } = useAuth();
   return (
     <div className="page-stack">
       <header className="page-heading">
@@ -12,35 +13,33 @@ export function SettingsPage() {
         <h1>Configurações</h1>
         <p>O status da fundação, sem atalhos para os seus dados.</p>
       </header>
+      <ProfilePanel />
       <Card className="settings-panel">
         <ShieldCheck size={28} />
         <h2>Conexão com o Supabase</h2>
         <p>
           {supabase
-            ? 'Variáveis válidas e cliente inicializado. Isso não comprova conectividade, autenticação ou disponibilidade do banco.'
+            ? 'Cliente configurado. Sua sessão foi verificada pelo Supabase Auth; isso não confirma a aplicação das tabelas e políticas RLS.'
             : 'Configure as variáveis abaixo no arquivo .env.local para inicializar o cliente.'}
         </p>
         <code>VITE_SUPABASE_URL</code>
         <code>VITE_SUPABASE_PUBLISHABLE_KEY</code>
         <span className="badge">
-          {supabase
-            ? 'Cliente configurado · conexão não verificada'
-            : 'Configuração pendente'}
+          {supabase ? 'Supabase Auth integrado' : 'Configuração pendente'}
         </span>
         <p>
           Use apenas a chave pública do projeto. Chaves secretas e a chave do
           Gemini pertencem exclusivamente ao backend.
         </p>
-        <Button asChild variant="outline">
-          <Link to="/login">
-            Sobre autenticação
-            <ExternalLink size={16} />
-          </Link>
-        </Button>
+        <p>Conta: {user?.email}</p>
       </Card>
       <Card className="settings-panel">
         <h2>O que está disponível</h2>
         <ul className="status-list">
+          <li>
+            <Check size={18} />
+            Login, sessão e proteção das rotas
+          </li>
           <li>
             <Check size={18} />
             Navegação, layout responsivo e tema escuro
@@ -55,7 +54,7 @@ export function SettingsPage() {
           </li>
           <li>
             <CircleDashed size={18} />
-            Autenticação, banco e RLS · Etapa 2
+            Validação do isolamento entre usuários · pendente
           </li>
           <li>
             <CircleDashed size={18} />

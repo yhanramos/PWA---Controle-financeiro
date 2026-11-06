@@ -1,0 +1,115 @@
+@use 'primitives';
+
+.forecast-summary {
+  .metric-value {
+    overflow-wrap: anywhere;
+  }
+  .forecast-details > div {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  dd {
+    overflow-wrap: anywhere;
+  }
+  &-note {
+    @extend %muted;
+    margin-top: 16px;
+  }
+}
+
+.financial-chart {
+  min-width: 0;
+  &-canvas {
+    height: 280px;
+    width: 100%;
+    min-width: 0;
+  }
+  &-note {
+    @extend %muted;
+    margin-top: 16px;
+  }
+  summary {
+    cursor: pointer;
+  }
+  summary:focus-visible {
+    @extend %focus;
+  }
+  &-table {
+    overflow-x: auto;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    caption {
+      @extend %muted;
+    }
+  }
+  &-categories {
+    list-style: none;
+    padding: 0;
+    li {
+      @extend %row;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 8px 0;
+    }
+    span {
+      @extend %row;
+      overflow-wrap: anywhere;
+    }
+    i {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.monthly-indicator {
+  .metric-value {
+    overflow-wrap: anywhere;
+  }
+  .metric-status {
+    @extend %muted;
+    font-size: 0.66rem;
+  }
+}
+
+.cash-balance {
+  .metric-value {
+    overflow-wrap: anywhere;
+  }
+  a {
+    text-decoration: underline;
+  }
+  &-details {
+    @extend %muted;
+    summary {
+      cursor: pointer;
+    }
+    summary:focus-visible {
+      @extend %focus;
+    }
+    dl {
+      margin-bottom: 0;
+    }
+    dl > div {
+      @extend %row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+}

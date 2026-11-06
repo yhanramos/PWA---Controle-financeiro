@@ -1,47 +1,20 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import {
-  ArrowDownLeft,
   ArrowUpRight,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
-  CreditCard,
-  Layers,
   Plus,
   Sparkles,
-  Wallet,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { currentMonth, monthLabel, shiftMonth } from '@/lib/utils/calendar';
-
-const indicators = [
-  {
-    title: 'Saldo de caixa',
-    subtitle: 'Somente valores efetivamente recebidos e pagos',
-    icon: Wallet,
-    tone: 'violet',
-  },
-  {
-    title: 'Receitas previstas',
-    subtitle: 'Previsão de entradas para o mês',
-    icon: ArrowDownLeft,
-    tone: 'green',
-  },
-  {
-    title: 'Despesas pendentes',
-    subtitle: 'Obrigações que ainda precisam ser pagas',
-    icon: ArrowUpRight,
-    tone: 'orange',
-  },
-  {
-    title: 'Total das faturas',
-    subtitle: 'Compromissos dos cartões no mês',
-    icon: CreditCard,
-    tone: 'blue',
-  },
-];
+import { CashBalanceCard } from './cash-balance-card';
+import { MonthlyIndicatorCards } from './monthly-indicator-cards';
+import { DashboardCharts } from './dashboard-charts';
+import { ForecastPanel } from './forecast-panel';
 
 export function DashboardPage() {
   const [month, setMonth] = useState(currentMonth);
@@ -92,10 +65,11 @@ export function DashboardPage() {
           <Sparkles size={23} />
         </span>
         <div>
-          <strong>O primeiro passo para uma rotina mais leve</strong>
+          <strong>Seu saldo e indicadores já estão conectados</strong>
           <p>
-            Fundação pronta. Conexão, autenticação e dados financeiros entram
-            nas próximas etapas.
+            Consulte o saldo, os indicadores e os gráficos dos seus registros. A
+            projeção já considera seus compromissos. Próximos vencimentos serão
+            integrados na próxima fase.
           </p>
         </div>
         <Button asChild variant="outline">
@@ -106,54 +80,10 @@ export function DashboardPage() {
         </Button>
       </section>
       <div className="metric-grid">
-        {indicators.map(({ title, subtitle, icon: Icon, tone }) => (
-          <Card className="metric-card" key={title}>
-            <div className="metric-header">
-              <span>{title}</span>
-              <span className={`metric-icon metric-icon--${tone}`}>
-                <Icon size={19} />
-              </span>
-            </div>
-            <strong className="metric-value" aria-label="Indisponível">
-              —
-            </strong>
-            <p>{subtitle}</p>
-            <span className="metric-status">Aguardando integração</span>
-          </Card>
-        ))}
+        <CashBalanceCard />
+        <MonthlyIndicatorCards month={month} />
       </div>
-      <div className="dashboard-columns">
-        <Card>
-          <header className="panel-heading">
-            <div>
-              <h2>Evolução financeira</h2>
-              <p>Entradas e saídas ao longo dos meses</p>
-            </div>
-            <span className="badge">Caixa</span>
-          </header>
-          <div className="chart-empty">
-            <div className="empty-chart-lines" aria-hidden="true" />
-            <Wallet size={27} />
-            <h3>Uma visão que começa com seus registros</h3>
-            <p>O gráfico será exibido quando houver dados reais.</p>
-          </div>
-        </Card>
-        <Card>
-          <header className="panel-heading">
-            <div>
-              <h2>Despesas por categoria</h2>
-              <p>Entenda para onde vai seu dinheiro</p>
-            </div>
-          </header>
-          <div className="chart-empty">
-            <div className="empty-donut" aria-hidden="true">
-              <Layers size={24} />
-            </div>
-            <h3>Sem dados conectados</h3>
-            <p>A análise por competência será implementada na Etapa 4.</p>
-          </div>
-        </Card>
-      </div>
+      <DashboardCharts month={month} />
       <div className="dashboard-columns">
         <Card>
           <header className="panel-heading">
@@ -171,27 +101,7 @@ export function DashboardPage() {
             </div>
           </div>
         </Card>
-        <Card className="forecast-panel">
-          <header className="panel-heading">
-            <div>
-              <h2>Um olhar para o fim do mês</h2>
-              <p>Projeção financeira</p>
-            </div>
-            <Sparkles size={20} />
-          </header>
-          <strong className="metric-value">—</strong>
-          <p>Saldo previsto indisponível até a integração dos registros.</p>
-          <dl className="forecast-details">
-            <div>
-              <dt>Receitas recebidas</dt>
-              <dd>—</dd>
-            </div>
-            <div>
-              <dt>Despesas pagas</dt>
-              <dd>—</dd>
-            </div>
-          </dl>
-        </Card>
+        <ForecastPanel month={month} />
       </div>
       <footer className="page-footnote">
         Seus números merecem precisão. Nenhum dado financeiro fictício é
