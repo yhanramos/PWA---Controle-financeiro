@@ -148,6 +148,9 @@ export function DashboardCharts({ month }: { month: string }) {
           Saídas incluem pagamentos de faturas. Sem saldo inicial ou projeções;
           estornos e cancelamentos refletem a situação atual.
         </p>
+        {data && !query.isError && query.isFetching && (
+          <p role="status">Atualizando gráficos…</p>
+        )}
       </Card>
       <Card className="financial-chart" aria-busy={query.isFetching}>
         <header className="panel-heading">

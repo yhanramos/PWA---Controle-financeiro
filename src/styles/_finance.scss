@@ -1,5 +1,75 @@
 @use 'primitives';
 
+.transaction-group {
+  min-width: 0;
+  summary {
+    @extend %row;
+    cursor: pointer;
+    list-style: none;
+    &::-webkit-details-marker {
+      display: none;
+    }
+    &:focus-visible {
+      @extend %focus;
+      border-radius: 8px;
+    }
+    > svg {
+      flex-shrink: 0;
+      color: var(--primary);
+    }
+  }
+  &-title {
+    display: grid;
+    gap: 5px;
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    > span {
+      @extend %muted;
+    }
+  }
+  &-value {
+    display: grid;
+    gap: 4px;
+    text-align: right;
+    small {
+      @extend %muted;
+      font-size: 0.7rem;
+    }
+  }
+  details[open] > summary .transaction-group-chevron {
+    transform: rotate(180deg);
+  }
+  &-content {
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+    padding-top: 16px;
+    a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+  }
+  .transaction-occurrence {
+    margin-top: 16px;
+    > p {
+      @extend %muted;
+    }
+  }
+  @media (max-width: 600px) {
+    summary {
+      flex-wrap: wrap;
+    }
+    &-title {
+      flex-basis: calc(100% - 45px);
+    }
+    &-value {
+      text-align: left;
+      margin-left: 34px;
+      flex: 1;
+    }
+  }
+}
+
 .finance-heading {
   display: flex;
   justify-content: space-between;
@@ -84,6 +154,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
+}
+.finance-form-note {
+  @extend %muted;
+  grid-column: 1 / -1;
+  margin: 0;
 }
 .finance-form label {
   display: grid;

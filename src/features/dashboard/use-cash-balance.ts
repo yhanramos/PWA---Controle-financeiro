@@ -21,6 +21,7 @@ export function useCashBalance() {
     queryKey: ['users', user?.id, 'cash-balance'],
     enabled: status === 'authenticated' && Boolean(user),
     retry: retryDataQuery,
+    networkMode: 'always',
     staleTime: 0,
     refetchInterval: 60_000,
     queryFn: async ({ signal }) => {

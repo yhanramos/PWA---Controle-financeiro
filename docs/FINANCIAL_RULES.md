@@ -1,5 +1,29 @@
 # Regras financeiras — contrato para implementação
 
+## Saldo após as contas — 06/11/2026
+
+Saldo de caixa atual menos despesas ainda pendentes fora do crédito e saldo em aberto das faturas selecionadas pelo dashboard. Usa o mesmo conjunto do resumo de despesas: vencimentos do mês, próximas recorrências incluídas no mês atual e faturas do ciclo atual. Despesas liquidadas e pagamentos confirmados não são descontados novamente; receitas previstas não são somadas. Saldo negativo é permitido e exibido como insuficiência. Para meses diferentes do atual, é comparação com o caixa de hoje, não saldo histórico ou projeção acumulada. Sem mudança de dados; leituras independentes podem apresentar divergência transitória durante atualização.
+
+## Despesas totais do mês — 06/11/2026
+
+Ajuste solicitado: no mês atual, quando uma recorrência não possui ocorrência válida vencendo nesse mês, incluir sua próxima ocorrência futura já gerada (prevista ou liquidada). Selecionar somente uma por regra, por vencimento e ID, sem somar a série inteira; uma ocorrência já paga no mês impede adicionar a do mês seguinte. Ocorrências canceladas não contam. Identificar no resumo o subtotal de recorrências futuras incluídas. Outros meses continuam estritamente por vencimento; nenhuma data, caixa ou projeção é alterada. Exemplo: primeira parcela do carro em 06/12 participa do resumo atual de novembro.
+
+Novo resumo = despesas fora do crédito, previstas ou liquidadas, com vencimento no mês selecionado + total líquido das faturas consideradas pelo dashboard. No mês atual, faturas do ciclo em formação; nos demais, faturas por mês de vencimento. Inclui ocorrências mensais já geradas (ex.: carro), compras e parcelas via fatura, sem somar novamente pagamentos de faturas nem o total original dos planos. Cancelados e receitas ficam fora; recorrências não geradas não são estimadas. Pagamento não reduz o total de despesas, apenas o pendente. Composição exibida separadamente; soma em BigInt, com validação de centavos e faixa segura. Caixa e projeção mantêm suas regras.
+
+## Faturas do ciclo atual no dashboard — 06/11/2026
+
+Ao selecionar o mês atual, o indicador de faturas soma compras e parcelas do ciclo em formação de cada cartão, mesmo com vencimento no mês seguinte. O ciclo inclui a data do fechamento anterior e exclui a data do próximo fechamento. Usar as datas reais das faturas; sem fatura anterior no mês precedente, estimar esse limite deslocando o fechamento um mês para trás, limitado ao último dia. Não escolher faturas de ciclos futuros distantes. Exemplo: em 06/11, fatura fechando em 01/12 e vencendo em 07/12 entra no indicador atual. Na data de fechamento, passa para o próximo ciclo. Faturas canceladas e itens cancelados não entram; pagamentos e descontos seguem as regras existentes.
+
+Outros meses continuam mostrando faturas pelo vencimento. A interface identifica a diferença e mostra cartão, fechamento e vencimento das faturas atuais. Receitas/despesas fora do crédito, próximos vencimentos e projeção continuam seguindo datas reais de pagamento, sem antecipar saídas de caixa. Nenhuma competência ou data persistida é alterada.
+
+## Etapa 4, fases 5 e 6 — vencimentos e filtro (2026-11-06)
+
+Próximos vencimentos lista as pendências com vencimento no mês selecionado, ordenadas por data e identificador. Inclui receitas e despesas pendentes fora do crédito e somente o saldo positivo das faturas não canceladas, calculado pela mesma regra dos indicadores. Compras e parcelas não aparecem novamente fora da fatura. Pagamentos confirmados reduzem o saldo; estornados não reduzem. Cadastros inativos preservam obrigações. Recorrências ainda não geradas não são inventadas.
+
+Atraso é vencimento anterior a hoje em America/Sao_Paulo; hoje possui indicação própria. Atrasados de outros meses ficam no respectivo mês, enquanto a projeção continua incluindo todos os atrasados até seu horizonte. Meses passados mostram pendências atuais, sem reconstruir a auditoria. A lista compartilha consulta autenticada, paginada, validada e cache com os indicadores; exibe oito itens inicialmente e permite expandir sem truncar os dados. Estados de erro nunca são apresentados como ausência de pendências.
+
+O seletor controla indicadores, vencimentos e competência; a evolução termina no mês escolhido. Caixa permanece atual e projeção só se aplica ao mês atual/futuro. Há retorno ao mês atual e limites de navegação de janeiro/1900 a dezembro/9999. Casos de regressão em `due-items.test.ts` escritos, sem execução.
+
 ## Etapa 4, fase 4 — projeção (2026-11-02)
 
 Projeção = caixa atual até hoje + receitas pendentes − despesas pendentes fora do crédito − saldo em aberto das faturas, considerando todos os vencimentos até o último dia do mês selecionado, inclusive atrasados e meses intermediários. O saldo das faturas já desconta pagamentos confirmados e descontos de parcelas; pagamentos estornados não liquidam obrigações. Não deduzir novamente parcelas/compras separadamente das faturas. Contas e cartões inativos preservam os compromissos existentes. Saldo negativo é válido.
@@ -58,11 +82,23 @@ Criar casos para centavos residuais, anos bissextos, fechamento/vencimento em di
 
 ## Parcelamentos — criação e calendário
 
-O cadastro solicita explicitamente fechamento e vencimento da primeira fatura ainda devida. As demais datas são calculadas a partir dessas duas âncoras, mês a mês, limitando dias inexistentes ao último dia do mês. Faturas existentes preservam suas datas; se divergirem, a operação inteira é rejeitada para que o usuário confira os dados. A criação não determina automaticamente a fatura pela data da compra. Isso permite ao usuário informar o período correto do emissor, inclusive compra no próprio dia do fechamento.
+Atualização de 06/11/2026: o cadastro não pede data da compra, fechamento nem vencimento. Por solicitação do usuário, a data da primeira tentativa de cadastro (America/Sao_Paulo) é usada como data da compra e mantida nas repetições da mesma operação durante a sessão. Não reconstrói a data original de compras antigas. O serviço consulta o cartão autenticado e ativo e calcula a primeira fatura pela data automática: compras no fechamento entram no próximo ciclo; vencimento menor ou igual ao dia de fechamento fica no mês seguinte. A quantidade de parcelas históricas define apenas a numeração inicial e as parcelas restantes; não avança o ciclo da primeira ainda devida e não cria pagamentos. Exemplo: cadastro em 06/11/2026, fechamento dia 1, vencimento dia 7 e uma parcela já paga → parcela 2 na fatura de 07/12/2026, não janeiro/2027. Correção de 06/11/2026: a versão anterior somava indevidamente o histórico ao calendário. Planos já persistidos não são corrigidos automaticamente; sem pagamentos nas faturas envolvidas, podem ser cancelados e recadastrados pelo fluxo auditável existente. Dias inexistentes são limitados ao fim do mês. Se a primeira fatura já existir, suas datas são preservadas.
+
+O RPC existente recebe as duas datas calculadas e mantém suas validações atômicas. As demais datas continuam ancoradas nessas primeiras datas, limitadas ao fim de cada mês. Isso preserva a regra atual do cronograma (inclusive a âncora reduzida quando a primeira data cai no fim de fevereiro); divergências de datas em outras faturas existentes continuam rejeitando a operação inteira. Não há alteração de schema nem reescrita de parcelamentos existentes.
 
 A migration 20261031000100, ainda não aplicada, foi substituída por uma operação que cria plano, faturas e parcelas atomicamente. Solicitações usam chave estável e comparação integral do pedido. A criação rejeita cartão/categoria inativos, faturas fechadas/canceladas/pagas e distribui centavos pelas primeiras parcelas originais. Importação gera somente parcelas posteriores ao histórico informado.
 
 ## Edições, antecipação e recorrências
+
+Movimentações agrupa ocorrências pelo ID da regra recorrente: um único cartão por regra, com periodicidade da âncora original (ex.: todo dia 6), primeira pendência e seu valor. Sem pendências, exibe o último registro. Não soma a série como valor mensal nem agrupa por descrição. Expandir o cartão permite consultar/editar cada ocorrência. Registros avulsos permanecem individuais; regras encerradas são identificadas, preservando os lançamentos existentes. Agrupamento somente visual, sem mudar dashboard, datas ou persistência.
+
+Receitas (06/11/2026): o formulário de movimentações e a edição não exibem vencimento para receitas. No cadastro, solicitar somente data do recebimento/previsão; internamente ela preenche ocorrência e `due_date` (campo obrigatório do schema), e também `settled_on` quando recebido. Previstas permanecem sem liquidação. A recorrência de receita usa essa data como primeira ocorrência. Na edição, a data de referência mantém ocorrência e `due_date` sincronizados. Despesas preservam vencimento separado. Nenhuma migration nem alteração retroativa em registros existentes.
+
+Movimentações (06/11/2026): cadastro avulso não solicita data efetiva; se recebido/pago, usa a data da ocorrência como liquidação, e se previsto mantém `settled_on` nulo. O editor de registros existentes mantém os ajustes de datas. A opção mensal usa o vencimento como âncora e cria uma regra mensal com data final opcional, seguida da geração dos primeiros 12 vencimentos (ou até a data final, se anterior). Todos são previstos, sem pagamentos automáticos. Dias 29–31 seguem a regra ancorada existente do backend. Continuação, edição e encerramento pela tela Recorrências; não há execução agendada em segundo plano.
+
+Criação da regra e geração são operações distintas: criação usa chave idempotente e geração reutiliza a unicidade da ocorrência. Se a geração falhar após salvar a regra, a interface informa o estado parcial e permite repetir sem duplicação; não criar um lançamento avulso paralelo. O horizonte é validado antes de salvar a regra. Nenhuma migration adicional. Casos de calendário escritos, sem execução.
+
+A tela de parcelamentos exibe somente planos ativos na listagem e nos cronogramas. Após cancelamento confirmado e atualização da consulta, o plano deixa de aparecer; os registros cancelados permanecem no banco para auditoria, sem exclusão física.
 
 A edição de parcelamentos preserva termos originais. Cancelamento exige estorno dos pagamentos das faturas envolvidas e altera plano/parcelas em uma transação. Antecipação move somente parcelas futuras elegíveis para uma fatura aberta anterior, preserva competência e aplica desconto em ordem crescente de parcela. O pagamento do valor líquido ocorre na mesma operação. Faturas com pagamentos prévios e parcelas já antecipadas não são elegíveis.
 

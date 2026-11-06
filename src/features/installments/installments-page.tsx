@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PlanActions } from './plan-actions';
-import { Layers } from 'lucide-react';
+import { Layers, ChevronDown, CalendarDays } from 'lucide-react';
+import { monthLabel } from '@/lib/utils/calendar';
 import {
   FinancialWorkspace,
   type Field,
@@ -33,6 +34,7 @@ export function InstallmentsPage() {
     );
   if (!plans.data || !cards.data || !categories.data)
     return <DataState title="Carregando parcelamentos…" loading />;
+  const activePlans = plans.data.filter((plan) => plan.status === 'active');
   const fields: Field[] = [
     { name: 'description', label: 'Descrição da compra', required: true },
     {
@@ -71,24 +73,6 @@ export function InstallmentsPage() {
       kind: 'number',
       required: true,
     },
-    {
-      name: 'purchased_on',
-      label: 'Data da compra',
-      kind: 'date',
-      required: true,
-    },
-    {
-      name: 'first_close',
-      label: 'Fechamento da primeira fatura ainda devida',
-      kind: 'date',
-      required: true,
-    },
-    {
-      name: 'first_due',
-      label: 'Vencimento da primeira fatura ainda devida',
-      kind: 'date',
-      required: true,
-    },
   ];
   return (
     <div className="page-stack">
@@ -103,24 +87,91 @@ export function InstallmentsPage() {
           await save.mutateAsync({ key, values });
           setKey(crypto.randomUUID());
         }}
-        rows={plans.data.map((p) => ({
+        rows={activePlans.map((p) => ({
           title: p.description,
           detail: `${p.installment_count} parcelas · ${p.paid_before_tracking} pagas antes do controle · ${p.status === 'active' ? 'Ativo' : 'Cancelado'}`,
           value: formatMoney(p.total_amount_cents),
         }))}
-        note="Informe as datas da primeira fatura ainda devida. As próximas mantêm os dias informados, limitados ao último dia de cada mês. Parcelas históricas não criam saídas de caixa."
+        note="A data do cadastro é usada como referência. Fechamento e vencimento são calculados pelo cartão; cadastros no dia do fechamento entram no próximo ciclo. Parcelas já pagas definem a numeração inicial, sem adiar a próxima fatura nem criar saídas de caixa."
       />
-      {plans.data.map((p) => (
-        <Card key={p.id}>
-          <details>
-            <summary>Cronograma · {p.description}</summary>
-            <ul>
+      {activePlans.map((p) => (
+        <Card key={p.id} className="installment-card">
+          <header className="installment-heading">
+            <span className="installment-icon">
+              <Layers size={22} aria-hidden="true" />
+            </span>
+            <div className="installment-title">
+              <h2>{p.description}</h2>
+              <p>
+                {String(
+                  cards.data.find((card) => card.id === p.credit_card_id)
+                    ?.name ?? 'Cartão',
+                )}{' '}
+                · {p.installment_count} parcelas
+              </p>
+            </div>
+            <span
+              className={`installment-badge installment-badge--${p.status}`}
+            >
+              {p.status === 'active' ? 'Ativo' : 'Cancelado'}
+            </span>
+          </header>
+          <dl className="installment-overview">
+            <div>
+              <dt>Valor original</dt>
+              <dd>{formatMoney(p.total_amount_cents)}</dd>
+            </div>
+            <div>
+              <dt>Pagas antes do controle</dt>
+              <dd>
+                {p.paid_before_tracking} de {p.installment_count}
+              </dd>
+            </div>
+            <div>
+              <dt>Parcelas no cronograma</dt>
+              <dd>{p.parts.length}</dd>
+            </div>
+          </dl>
+          <details className="installment-schedule">
+            <summary>
+              <span>
+                <CalendarDays size={18} aria-hidden="true" /> Cronograma de
+                parcelas
+              </span>
+              <ChevronDown
+                size={18}
+                className="schedule-chevron"
+                aria-hidden="true"
+              />
+            </summary>
+            <ul aria-label={`Parcelas de ${p.description}`}>
               {p.parts.map((part) => (
-                <li key={part.id}>
-                  Parcela {part.installment_number}/{p.installment_count} ·
-                  competência {part.competence_month.slice(0, 7)} ·{' '}
-                  {formatMoney(part.amount_cents - part.discount_cents)} ·{' '}
-                  {part.status === 'active' ? 'Ativa' : 'Cancelada'}
+                <li
+                  key={part.id}
+                  className={
+                    part.status === 'cancelled'
+                      ? 'installment-row--cancelled'
+                      : undefined
+                  }
+                >
+                  <span className="installment-number">
+                    {String(part.installment_number).padStart(2, '0')}
+                    <small>/{p.installment_count}</small>
+                  </span>
+                  <div className="installment-period">
+                    <strong>
+                      {monthLabel(part.competence_month.slice(0, 7))}
+                    </strong>
+                    <span>Competência da parcela</span>
+                  </div>
+                  <strong className="installment-amount">
+                    {formatMoney(part.amount_cents - part.discount_cents)}
+                  </strong>
+                  <span
+                    className={`installment-badge installment-badge--${part.status}`}
+                  >
+                    {part.status === 'active' ? 'Ativa' : 'Cancelada'}
+                  </span>
                 </li>
               ))}
             </ul>

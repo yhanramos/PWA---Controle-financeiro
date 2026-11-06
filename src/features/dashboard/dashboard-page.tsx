@@ -1,20 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import {
-  ArrowUpRight,
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  Sparkles,
-} from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { currentMonth, monthLabel, shiftMonth } from '@/lib/utils/calendar';
 import { CashBalanceCard } from './cash-balance-card';
 import { MonthlyIndicatorCards } from './monthly-indicator-cards';
 import { DashboardCharts } from './dashboard-charts';
 import { ForecastPanel } from './forecast-panel';
+import { UpcomingDues } from './upcoming-dues';
+import { RemainingBalanceCard } from './remaining-balance-card';
 
 export function DashboardPage() {
   const [month, setMonth] = useState(currentMonth);
@@ -41,7 +35,8 @@ export function DashboardPage() {
             variant="ghost"
             size="icon"
             aria-label="Mês anterior"
-            onClick={() => setMonth(shiftMonth(month, -1))}
+            disabled={month <= '1900-01'}
+            onClick={() => setMonth((value) => shiftMonth(value, -1))}
           >
             <ChevronLeft size={18} />
           </Button>
@@ -53,59 +48,40 @@ export function DashboardPage() {
             variant="ghost"
             size="icon"
             aria-label="Próximo mês"
-            onClick={() => setMonth(shiftMonth(month, 1))}
+            disabled={month >= '9999-12'}
+            onClick={() => setMonth((value) => shiftMonth(value, 1))}
           >
             <ChevronRight size={18} />
           </Button>
         </div>
+        <Button
+          variant="outline"
+          disabled={month === currentMonth()}
+          onClick={() => setMonth(currentMonth())}
+        >
+          Mês atual
+        </Button>
         <span className="muted">Visão mensal · America/Sao_Paulo</span>
       </div>
-      <section className="setup-banner" aria-label="Status da implementação">
-        <span className="feature-icon">
-          <Sparkles size={23} />
-        </span>
-        <div>
-          <strong>Seu saldo e indicadores já estão conectados</strong>
-          <p>
-            Consulte o saldo, os indicadores e os gráficos dos seus registros. A
-            projeção já considera seus compromissos. Próximos vencimentos serão
-            integrados na próxima fase.
-          </p>
-        </div>
-        <Button asChild variant="outline">
-          <Link to="/configuracoes">
-            Ver configuração
-            <ArrowUpRight size={16} />
-          </Link>
-        </Button>
-      </section>
+      <p className="dashboard-filter-note">
+        No mês atual, as faturas mostram o ciclo em formação, mesmo com
+        vencimento no mês seguinte. Nos outros meses, seguem o vencimento.
+        Receitas, despesas e próximos vencimentos seguem o mês escolhido; o
+        caixa é atual e a projeção respeita as datas de pagamento.
+      </p>
       <div className="metric-grid">
         <CashBalanceCard />
         <MonthlyIndicatorCards month={month} />
+        <RemainingBalanceCard month={month} />
       </div>
       <DashboardCharts month={month} />
       <div className="dashboard-columns">
-        <Card>
-          <header className="panel-heading">
-            <div>
-              <h2>Próximos vencimentos</h2>
-              <p>Seus compromissos, sem surpresas</p>
-            </div>
-            <CalendarDays size={20} />
-          </header>
-          <div className="simple-empty">
-            <CalendarDays size={25} />
-            <div>
-              <h3>Calendário financeiro em preparação</h3>
-              <p>Faturas, parcelas e recorrências aparecerão aqui.</p>
-            </div>
-          </div>
-        </Card>
+        <UpcomingDues key={month} month={month} />
         <ForecastPanel month={month} />
       </div>
       <footer className="page-footnote">
-        Seus números merecem precisão. Nenhum dado financeiro fictício é
-        exibido.
+        Os valores refletem a situação atual dos registros, inclusive em meses
+        passados.
       </footer>
     </div>
   );

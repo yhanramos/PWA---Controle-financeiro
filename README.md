@@ -1,6 +1,6 @@
 # Clareza — Controle financeiro pessoal
 
-PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. Etapas 1 a 3 entregues, com validação manual dos fluxos financeiros registrada em docs/STAGE3_VALIDATION.md. Etapa 4 em andamento: o saldo de caixa atual já consulta dados reais, com composição, estornos e estados de carregamento/erro. Indicadores mensais de receitas previstas, despesas pendentes fora do crédito e total/em aberto das faturas já consultam registros reais pelo mês de vencimento. Gráficos Recharts de evolução do caixa e despesas por categoria estão integrados ao mês selecionado. Projeção financeira até o fim do mês selecionado implementada, com composição e atrasados. Próximos vencimentos e revisão integrada dos filtros continuam pendentes. IA ainda não implementada. Nenhum valor demonstrativo é apresentado como real.
+PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. Etapas 1 a 3 entregues, com validação manual dos fluxos financeiros registrada em docs/STAGE3_VALIDATION.md. Etapa 4 implementada: o saldo de caixa atual já consulta dados reais, com composição, estornos e estados de carregamento/erro. Indicadores mensais de receitas previstas, despesas pendentes fora do crédito e total/em aberto das faturas já consultam registros reais pelo mês de vencimento. Gráficos Recharts de evolução do caixa e despesas por categoria estão integrados ao mês selecionado. Projeção financeira até o fim do mês selecionado implementada, com composição e atrasados. Próximos vencimentos integrados ao mês, com receitas/despesas pendentes, saldo em aberto de faturas, indicação de atraso/hoje e expansão da lista. Filtros e estados revisados em código; validação visual e de produção permanece na Etapa 6. IA ainda não implementada. Nenhum valor demonstrativo é apresentado como real.
 
 ## Pré-requisitos e instalação
 
@@ -28,9 +28,9 @@ npm run dev
 
 ## Stack
 
-React 19, TypeScript estrito, Vite 7, Tailwind 4, convenções shadcn/ui com Radix Slot e CVA, React Router 7, TanStack Query 5, Supabase JS, Lucide e SCSS. React Hook Form, Zod, Recharts, Vitest e React Testing Library estão preparados para as próximas etapas. O PWA usa vite-plugin-pwa e Workbox. Versões resolvidas são registradas no lockfile.
+React 19, TypeScript estrito, Vite 7, Tailwind 4, convenções shadcn/ui com Radix Slot e CVA, React Router 7, TanStack Query 5, Supabase JS, Lucide e SCSS. React Hook Form e Zod validam os formulários; Recharts apresenta os gráficos financeiros. Vitest e React Testing Library estão disponíveis, sem execução das suítes nesta etapa. O PWA usa vite-plugin-pwa e Workbox. Versões resolvidas são registradas no lockfile.
 
-Tailwind é processado em `src/styles/tailwind.css`, separado do Sass. Estilos de produto ficam em SCSS com herança via placeholders e `@extend`. Componentes UI são código local customizável; `components.json` configura o shadcn/ui. O formulário de login usa React Hook Form e Zod; formulários e gráficos financeiros ainda não foram criados.
+Tailwind é processado em `src/styles/tailwind.css`, separado do Sass. Estilos de produto ficam em SCSS com herança via placeholders e `@extend`. Componentes UI são código local customizável; `components.json` configura o shadcn/ui. Formulários financeiros e gráficos do dashboard estão implementados com dados reais.
 
 ## Estrutura
 
@@ -88,7 +88,7 @@ O service worker fica desativado no desenvolvimento. Após validação autorizad
 
 Em **Configurações → Seu perfil**, é possível carregar e salvar seu nome no Supabase. A tela **Categorias** consulta os registros reais da conta e separa receitas/despesas. Os tipos oficiais e a inspeção remota estão documentados em [PERSISTENCE.md](docs/PERSISTENCE.md). Nenhuma alteração de perfil ou dado financeiro foi feita no banco durante esta implementação.
 
-Executar a **Etapa 2 — Banco e autenticação**, conforme [roadmap](docs/ROADMAP.md). Consulte [arquitetura](docs/ARCHITECTURE.md), [banco](docs/DATABASE.md), [regras financeiras](docs/FINANCIAL_RULES.md) e [IA](docs/AI_INTEGRATION.md).
+Próxima implementação: **Etapa 5 — Inteligência artificial**, conforme [roadmap](docs/ROADMAP.md). Consulte [arquitetura](docs/ARCHITECTURE.md), [banco](docs/DATABASE.md), [regras financeiras](docs/FINANCIAL_RULES.md) e [IA](docs/AI_INTEGRATION.md).
 
 ## Login local e segurança
 

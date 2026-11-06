@@ -63,7 +63,14 @@ export function RecordEditor({
               .map((c) => ({ value: String(c.id), label: String(c.name) })) ??
             [],
         },
-        { name: 'occurred_on', label: 'Ocorrência', type: 'date' },
+        {
+          name: 'occurred_on',
+          label:
+            row.kind === 'income'
+              ? 'Data do recebimento / previsão'
+              : 'Ocorrência',
+          type: 'date',
+        },
         { name: 'notes', label: 'Observações', nullable: true, max: 2000 },
         ...(!credit
           ? [
@@ -78,7 +85,9 @@ export function RecordEditor({
                       label: String(a.name),
                     })) ?? [],
               },
-              { name: 'due_date', label: 'Vencimento', type: 'date' },
+              ...(row.kind === 'income'
+                ? []
+                : [{ name: 'due_date', label: 'Vencimento', type: 'date' }]),
               {
                 name: 'status',
                 label: 'Situação',
@@ -216,6 +225,8 @@ export function RecordEditor({
               .parse(value);
         }
         if (changes.status === 'pending') changes.settled_on = null;
+        if (transaction && row.kind === 'income')
+          changes.due_date = changes.occurred_on;
       }
       await mutation.mutateAsync({
         id: String(row.id),

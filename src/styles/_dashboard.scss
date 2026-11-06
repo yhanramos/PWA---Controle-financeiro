@@ -1,5 +1,86 @@
 @use 'primitives';
 
+.remaining-balance {
+  .metric-value {
+    overflow-wrap: anywhere;
+  }
+  &--negative {
+    color: var(--warning);
+  }
+}
+
+.monthly-expense-total {
+  grid-column: 1 / -1;
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+  .expense-total-composition {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+    gap: 16px;
+    margin: 20px 0;
+    > div {
+      padding: 16px;
+      border-radius: 12px;
+      background: var(--background);
+    }
+    dt {
+      @extend %muted;
+    }
+    dd {
+      margin: 8px 0 0;
+      font-weight: 600;
+      font-size: 1.1rem;
+      overflow-wrap: anywhere;
+    }
+  }
+}
+
+.dashboard-filter-note {
+  @extend %muted;
+  margin: 0;
+}
+
+.upcoming-dues {
+  min-width: 0;
+  .due-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    li {
+      @extend %row;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    strong {
+      overflow-wrap: anywhere;
+    }
+  }
+  .due-description {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    flex: 1 1 160px;
+    overflow-wrap: anywhere;
+    span {
+      @extend %muted;
+    }
+    a {
+      text-decoration: underline;
+    }
+    a:focus-visible {
+      @extend %focus;
+    }
+    .due-overdue {
+      color: var(--warning);
+    }
+  }
+  .due-income {
+    color: var(--positive);
+  }
+}
+
 .forecast-summary {
   .metric-value {
     overflow-wrap: anywhere;
@@ -73,6 +154,24 @@
 }
 
 .monthly-indicator {
+  .current-invoice-dates {
+    @extend %muted;
+    list-style: none;
+    padding: 0;
+    margin: 12px 0;
+    li {
+      display: grid;
+      gap: 4px;
+      padding: 8px 0;
+      border-top: 1px solid var(--border);
+    }
+    strong {
+      color: var(--foreground);
+    }
+    span {
+      font-size: 0.72rem;
+    }
+  }
   .metric-value {
     overflow-wrap: anywhere;
   }

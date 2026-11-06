@@ -11,6 +11,9 @@ export type Field = {
   required?: boolean;
   options?: { value: string; label: string }[];
   placeholder?: string;
+  defaultValue?: string;
+  showWhen?: { field: string; value: string };
+  showAllWhen?: { field: string; value: string }[];
 };
 type Props = {
   title: string;
@@ -22,6 +25,8 @@ type Props = {
   onSave?: (values: Record<string, string>) => Promise<void>;
   rows?: Record<string, string>[];
   note: string;
+  formNote?: string;
+  records?: ReactNode;
 };
 export function FinancialWorkspace({
   title,
@@ -33,7 +38,10 @@ export function FinancialWorkspace({
   onSave,
   rows = [],
   note,
+  formNote,
+  records,
 }: Props) {
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [open, setOpen] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState('');
@@ -50,6 +58,7 @@ export function FinancialWorkspace({
     try {
       await onSave(values);
       form.reset();
+      setFieldValues({});
       setOpen(false);
     } catch (error) {
       setError(
@@ -69,44 +78,85 @@ export function FinancialWorkspace({
           <h1>{title}</h1>
           <p>{description}</p>
         </div>
-        <Button disabled={busy} onClick={() => setOpen(!open)}>
+        <Button
+          disabled={busy}
+          onClick={() => {
+            setOpen(!open);
+            setFieldValues({});
+          }}
+        >
           {action}
         </Button>
       </header>
       {open && (
         <Card className="finance-form-panel">
-          <form className="finance-form" onSubmit={submit}>
-            {fields.map((f) => (
-              <label key={f.name}>
-                {f.label}
-                {f.kind === 'select' ? (
-                  <select name={f.name} required={f.required} defaultValue="">
-                    <option value="" disabled>
-                      Selecione
-                    </option>
-                    {f.options?.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
+          <form
+            className="finance-form"
+            onSubmit={submit}
+            onChange={(event) => {
+              const target = event.target;
+              if (
+                target instanceof HTMLInputElement ||
+                target instanceof HTMLSelectElement ||
+                target instanceof HTMLTextAreaElement
+              )
+                setFieldValues((values) => ({
+                  ...values,
+                  [target.name]: target.value,
+                }));
+            }}
+          >
+            {fields
+              .filter((f) =>
+                [
+                  ...(f.showWhen ? [f.showWhen] : []),
+                  ...(f.showAllWhen ?? []),
+                ].every(
+                  (condition) =>
+                    (fieldValues[condition.field] ??
+                      fields.find((field) => field.name === condition.field)
+                        ?.defaultValue ??
+                      '') === condition.value,
+                ),
+              )
+              .map((f) => (
+                <label key={f.name}>
+                  {f.label}
+                  {f.kind === 'select' ? (
+                    <select
+                      name={f.name}
+                      required={f.required}
+                      defaultValue={f.defaultValue ?? ''}
+                    >
+                      <option value="" disabled>
+                        Selecione
                       </option>
-                    ))}
-                  </select>
-                ) : f.kind === 'textarea' ? (
-                  <textarea
-                    name={f.name}
-                    placeholder={f.placeholder}
-                    required={f.required}
-                  />
-                ) : (
-                  <input
-                    name={f.name}
-                    type={f.kind ?? 'text'}
-                    placeholder={f.placeholder}
-                    required={f.required}
-                    min={f.kind === 'number' ? 0 : undefined}
-                  />
-                )}
-              </label>
-            ))}
+                      {f.options?.map((o) => (
+                        <option key={o.value} value={o.value}>
+                          {o.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : f.kind === 'textarea' ? (
+                    <textarea
+                      name={f.name}
+                      placeholder={f.placeholder}
+                      required={f.required}
+                      defaultValue={f.defaultValue}
+                    />
+                  ) : (
+                    <input
+                      name={f.name}
+                      type={f.kind ?? 'text'}
+                      placeholder={f.placeholder}
+                      required={f.required}
+                      min={f.kind === 'number' ? 0 : undefined}
+                      defaultValue={f.defaultValue}
+                    />
+                  )}
+                </label>
+              ))}
+            {formNote && <p className="finance-form-note">{formNote}</p>}
             <div className="finance-form-actions">
               <Button type="submit" disabled={busy || !onSave}>
                 {busy ? 'Salvando…' : 'Salvar'}
@@ -114,7 +164,10 @@ export function FinancialWorkspace({
               <Button
                 disabled={busy}
                 variant="ghost"
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  setOpen(false);
+                  setFieldValues({});
+                }}
               >
                 Cancelar
               </Button>
@@ -123,33 +176,34 @@ export function FinancialWorkspace({
           </form>
         </Card>
       )}
-      {rows.length ? (
-        <div className="finance-record-list">
-          {rows.map((row, i) => (
-            <Card key={i} className="finance-record">
-              {icon}
-              <div>
-                <strong>{row.title}</strong>
-                <span>{row.detail}</span>
-              </div>
-              <b>{row.value}</b>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <Card className="finance-empty">
-          {icon}
-          <span className="badge">
-            {onSave ? 'Sem registros' : 'Somente consulta disponível'}
-          </span>
-          <h2>
-            {onSave
-              ? 'Comece adicionando seu primeiro registro'
-              : `Nenhum registro de ${title.toLocaleLowerCase()} ainda`}
-          </h2>
-          <p>{note}</p>
-        </Card>
-      )}
+      {records ??
+        (rows.length ? (
+          <div className="finance-record-list">
+            {rows.map((row, i) => (
+              <Card key={i} className="finance-record">
+                {icon}
+                <div>
+                  <strong>{row.title}</strong>
+                  <span>{row.detail}</span>
+                </div>
+                <b>{row.value}</b>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card className="finance-empty">
+            {icon}
+            <span className="badge">
+              {onSave ? 'Sem registros' : 'Somente consulta disponível'}
+            </span>
+            <h2>
+              {onSave
+                ? 'Comece adicionando seu primeiro registro'
+                : `Nenhum registro de ${title.toLocaleLowerCase()} ainda`}
+            </h2>
+            <p>{note}</p>
+          </Card>
+        ))}
     </div>
   );
 }
