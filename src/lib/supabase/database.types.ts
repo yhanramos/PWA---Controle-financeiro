@@ -749,6 +749,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      ai_financial_overview: { Args: { p_month: string }; Returns: Json };
       anticipate_installment_plan: {
         Args: {
           p_account: string;
@@ -759,6 +760,10 @@ export type Database = {
           p_plan: string;
         };
         Returns: string;
+      };
+      begin_ai_request: {
+        Args: { p_conversation: string; p_message: string; p_request: string };
+        Returns: Json;
       };
       cancel_installment_plan: {
         Args: { p_plan: string; p_version: string };
@@ -798,9 +803,37 @@ export type Database = {
         };
         Returns: string;
       };
+      finish_ai_expense: {
+        Args: {
+          p_account: string;
+          p_amount: number;
+          p_card: string;
+          p_category: string;
+          p_date: string;
+          p_description: string;
+          p_method: string;
+          p_request: string;
+          p_response: string;
+          p_user: string;
+        };
+        Returns: string;
+      };
+      finish_ai_request: {
+        Args: { p_request: string; p_response: string; p_user: string };
+        Returns: undefined;
+      };
       generate_recurrences: {
         Args: { p_rule: string; p_until: string };
         Returns: number;
+      };
+      manage_wallet: {
+        Args: {
+          p_action: string;
+          p_alias?: string;
+          p_card?: string;
+          p_category?: string;
+        };
+        Returns: Json;
       };
       pay_invoice: {
         Args: {
@@ -811,6 +844,17 @@ export type Database = {
           p_key: string;
         };
         Returns: string;
+      };
+      receive_wallet_purchase: {
+        Args: {
+          p_alias: string;
+          p_amount: number;
+          p_date: string;
+          p_event: string;
+          p_hash: string;
+          p_merchant: string;
+        };
+        Returns: Json;
       };
       reverse_invoice_payment: {
         Args: { p_payment: string; p_reason: string };

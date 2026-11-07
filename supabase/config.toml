@@ -1,0 +1,3 @@
+[functions.apple-wallet]
+# Atalhos uses a per-user key. Handler verifies that key or an Auth JWT.
+verify_jwt = false
