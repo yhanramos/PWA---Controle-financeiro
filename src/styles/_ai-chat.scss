@@ -1,0 +1,64 @@
+@use 'primitives';
+.ai-chat {
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  &-heading {
+    @extend %row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    h2 {
+      font-size: 1rem;
+    }
+  }
+  &-messages {
+    display: grid;
+    gap: 16px;
+    list-style: none;
+    padding: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  &-message {
+    @extend %surface;
+    padding: 16px;
+    margin-right: 24px;
+    background: var(--background);
+    strong {
+      color: var(--primary);
+      font-size: 0.8rem;
+    }
+    p {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.7;
+      margin: 8px 0 0;
+    }
+    &--user {
+      margin-right: 0;
+      margin-left: 24px;
+      background: var(--muted);
+    }
+  }
+  &-form {
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+    textarea {
+      font: inherit;
+      color: var(--foreground);
+      background: var(--background);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      resize: vertical;
+      width: 100%;
+      &:focus-visible {
+        @extend %focus;
+      }
+    }
+    > button {
+      justify-self: end;
+    }
+  }
+}

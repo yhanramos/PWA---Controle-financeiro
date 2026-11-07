@@ -1,5 +1,17 @@
 export const TIME_ZONE = 'America/Sao_Paulo';
 
+export function currentDate(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: TIME_ZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(now);
+  const part = (name: string) =>
+    parts.find((value) => value.type === name)?.value;
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+
 export function currentMonth() {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: TIME_ZONE,

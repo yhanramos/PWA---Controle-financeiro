@@ -49,7 +49,11 @@ function safe(value: bigint) {
   return Number(value);
 }
 
-export function calculateMonthlyIndicators(input: MonthlyData, month: string) {
+export function calculateMonthlyIndicators(
+  input: MonthlyData,
+  month: string,
+  invoiceIds?: ReadonlySet<string>,
+) {
   indicatorMonthSchema.parse(month);
   const data = monthlyDataSchema.parse(input);
   const inMonth = (date: string) => date.slice(0, 7) === month;
@@ -59,7 +63,11 @@ export function calculateMonthlyIndicators(input: MonthlyData, month: string) {
     expenseCount = 0;
   const invoices = new Map(
     data.invoices
-      .filter((i) => i.status !== 'cancelled' && inMonth(i.due_date))
+      .filter(
+        (i) =>
+          i.status !== 'cancelled' &&
+          (invoiceIds ? invoiceIds.has(i.id) : inMonth(i.due_date)),
+      )
       .map((i) => [i.id, { total: 0n, paid: 0n }]),
   );
   for (const tx of data.transactions) {
@@ -121,5 +129,9 @@ export function calculateMonthlyIndicators(input: MonthlyData, month: string) {
     incomeCount,
     expenseCount,
     invoiceCount: invoices.size,
+    invoiceBalances: [...invoices].map(([id, invoice]) => ({
+      id,
+      outstanding: safe(invoice.total - invoice.paid),
+    })),
   };
 }

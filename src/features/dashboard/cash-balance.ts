@@ -102,6 +102,7 @@ export function calculateCashBalance(
     income: safeNumber(income),
     expenses: safeNumber(expenses),
     invoicePayments: safeNumber(invoicePayments),
+    totalBeforeExpenses: safeNumber(opening + income),
     balance: safeNumber(opening + income - expenses - invoicePayments),
   };
 }

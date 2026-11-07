@@ -1,6 +1,12 @@
 # Clareza — Controle financeiro pessoal
 
-PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. Etapas 1 a 3 entregues, com validação manual dos fluxos financeiros registrada em docs/STAGE3_VALIDATION.md. Etapa 4 em andamento: o saldo de caixa atual já consulta dados reais, com composição, estornos e estados de carregamento/erro. Indicadores mensais de receitas previstas, despesas pendentes fora do crédito e total/em aberto das faturas já consultam registros reais pelo mês de vencimento. Gráficos Recharts de evolução do caixa e despesas por categoria estão integrados ao mês selecionado. Projeção financeira até o fim do mês selecionado implementada, com composição e atrasados. Próximos vencimentos e revisão integrada dos filtros continuam pendentes. IA ainda não implementada. Nenhum valor demonstrativo é apresentado como real.
+**Dashboard e IA (07/11/2026):** “Saldo total” mostra saldos iniciais + receitas recebidas sem deduções; “Saldo após as contas” aparece em seguida. Indicadores de receitas previstas/despesas pendentes removidos da grade. IA usa crédito por padrão, exceto Pix/débito explícitos. Sem alteração de lançamentos antigos ou nova migration; republicar a função para ativar a regra da IA.
+
+**Revisão do chat (06/11/2026):** conversa apenas na memória da tela, sem histórico salvo ou blocos de sugestões. Cartão informado significa crédito. Após a migration `002`, aplicar `supabase/migrations/20261106000300_ephemeral_ai_chat.sql` e republicar a função. A nova migration remove conteúdo de conversas antigas, preservando despesas e controle técnico contra duplicação. Ainda não aplicada remotamente.
+
+**Atualização da IA (06/11/2026):** consultas confirmadas pelo usuário. Registro de despesas avulsas pelo chat (com ou sem cartão) e rolagem automática implementados localmente. Para ativar as escritas, aplicar somente `supabase/migrations/20261106000200_ai_expenses.sql` e republicar `financial-assistant`; ver [instruções](supabase/functions/financial-assistant/README.md). Sem execução de build ou testes. As descrições de ativação pendente da primeira fase abaixo são históricas.
+
+PWA em português brasileiro para organizar receitas, despesas, cartões e compromissos futuros. Etapas 1 a 3 entregues, com validação manual dos fluxos financeiros registrada em docs/STAGE3_VALIDATION.md. Etapa 4 implementada: o saldo de caixa atual já consulta dados reais, com composição, estornos e estados de carregamento/erro. Indicadores mensais de receitas previstas, despesas pendentes fora do crédito e total/em aberto das faturas já consultam registros reais pelo mês de vencimento. Gráficos Recharts de evolução do caixa e despesas por categoria estão integrados ao mês selecionado. Projeção financeira até o fim do mês selecionado implementada, com composição e atrasados. Próximos vencimentos integrados ao mês, com receitas/despesas pendentes, saldo em aberto de faturas, indicação de atraso/hoje e expansão da lista. Filtros e estados revisados em código; validação visual e de produção permanece na Etapa 6. IA em implementação: primeira fase de consultas e chat escrita, com ativação no Supabase ainda pendente (docs/AI_INTEGRATION.md). Nenhum valor demonstrativo é apresentado como real.
 
 ## Pré-requisitos e instalação
 
@@ -28,9 +34,9 @@ npm run dev
 
 ## Stack
 
-React 19, TypeScript estrito, Vite 7, Tailwind 4, convenções shadcn/ui com Radix Slot e CVA, React Router 7, TanStack Query 5, Supabase JS, Lucide e SCSS. React Hook Form, Zod, Recharts, Vitest e React Testing Library estão preparados para as próximas etapas. O PWA usa vite-plugin-pwa e Workbox. Versões resolvidas são registradas no lockfile.
+React 19, TypeScript estrito, Vite 7, Tailwind 4, convenções shadcn/ui com Radix Slot e CVA, React Router 7, TanStack Query 5, Supabase JS, Lucide e SCSS. React Hook Form e Zod validam os formulários; Recharts apresenta os gráficos financeiros. Vitest e React Testing Library estão disponíveis, sem execução das suítes nesta etapa. O PWA usa vite-plugin-pwa e Workbox. Versões resolvidas são registradas no lockfile.
 
-Tailwind é processado em `src/styles/tailwind.css`, separado do Sass. Estilos de produto ficam em SCSS com herança via placeholders e `@extend`. Componentes UI são código local customizável; `components.json` configura o shadcn/ui. O formulário de login usa React Hook Form e Zod; formulários e gráficos financeiros ainda não foram criados.
+Tailwind é processado em `src/styles/tailwind.css`, separado do Sass. Estilos de produto ficam em SCSS com herança via placeholders e `@extend`. Componentes UI são código local customizável; `components.json` configura o shadcn/ui. Formulários financeiros e gráficos do dashboard estão implementados com dados reais.
 
 ## Estrutura
 
@@ -76,7 +82,7 @@ O script cria as 10 entidades previstas, `invoice_payments` para evitar dupla co
 
 Os tipos oficiais foram gerados do schema remoto. Perfil com edição do nome e consulta das categorias reais já usam serviços tipados e TanStack Query. Continua pendente a validação comportamental do RLS entre dois usuários. A autenticação do frontend foi integrada e o usuário confirmou que o login funcionou em 30/10/2026. Regras financeiras atômicas entram na Etapa 3. Nenhuma tela financeira atual acessa banco sem autenticação. Não publicar dados de usuários antes de validar isolamento com RLS.
 
-Na Etapa 5, configurar `GEMINI_API_KEY` em Supabase Secrets e implementar `financial-assistant`. O frontend enviará chamadas autenticadas à Edge Function; não falará diretamente com Gemini. O placeholder de chave em `.env.example` é apenas documentação, não é utilizado pelo frontend.
+Na Etapa 5, a primeira fase de `financial-assistant` está escrita; aplicar a nova migration, configurar os secrets e publicar a função conforme `supabase/functions/financial-assistant/README.md`. O frontend enviará chamadas autenticadas à Edge Function; não falará diretamente com Gemini. O placeholder de chave em `.env.example` é apenas documentação, não é utilizado pelo frontend.
 
 ## PWA e hospedagem
 
@@ -88,7 +94,7 @@ O service worker fica desativado no desenvolvimento. Após validação autorizad
 
 Em **Configurações → Seu perfil**, é possível carregar e salvar seu nome no Supabase. A tela **Categorias** consulta os registros reais da conta e separa receitas/despesas. Os tipos oficiais e a inspeção remota estão documentados em [PERSISTENCE.md](docs/PERSISTENCE.md). Nenhuma alteração de perfil ou dado financeiro foi feita no banco durante esta implementação.
 
-Executar a **Etapa 2 — Banco e autenticação**, conforme [roadmap](docs/ROADMAP.md). Consulte [arquitetura](docs/ARCHITECTURE.md), [banco](docs/DATABASE.md), [regras financeiras](docs/FINANCIAL_RULES.md) e [IA](docs/AI_INTEGRATION.md).
+Próxima implementação: **Etapa 5 — Inteligência artificial**, conforme [roadmap](docs/ROADMAP.md). Consulte [arquitetura](docs/ARCHITECTURE.md), [banco](docs/DATABASE.md), [regras financeiras](docs/FINANCIAL_RULES.md) e [IA](docs/AI_INTEGRATION.md).
 
 ## Login local e segurança
 

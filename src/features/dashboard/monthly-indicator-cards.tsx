@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, CreditCard } from 'lucide-react';
+import { CreditCard, Wallet } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatMoney } from '@/lib/financial-money';
@@ -11,40 +11,48 @@ export function MonthlyIndicatorCards({ month }: { month: string }) {
   const data = query.data;
   const indicators = [
     {
-      title: 'Receitas previstas',
-      subtitle: 'A receber · vencimentos do mês',
-      icon: ArrowDownLeft,
-      tone: 'green',
-      value: data?.income,
-      count: data?.incomeCount,
-      empty: 'Nenhuma receita pendente neste mês.',
-    },
-    {
-      title: 'Despesas pendentes',
-      subtitle: 'A pagar fora do crédito · vencimentos do mês',
-      icon: ArrowUpRight,
-      tone: 'orange',
-      value: data?.expenses,
-      count: data?.expenseCount,
-      empty: 'Nenhuma despesa pendente fora do crédito.',
-    },
-    {
-      title: 'Total das faturas',
-      subtitle: 'Compras e parcelas, após descontos · vencimentos do mês',
+      title: data?.currentInvoices
+        ? 'Faturas do ciclo atual'
+        : 'Total das faturas',
+      subtitle: data?.currentInvoices
+        ? 'Compras e parcelas do ciclo em formação'
+        : 'Compras e parcelas, após descontos · vencimentos do mês',
       icon: CreditCard,
       tone: 'blue',
-      value: data?.invoiceTotal,
-      count: data?.invoiceCount,
-      empty: 'Nenhuma fatura com vencimento neste mês.',
+      value: data?.currentInvoices?.total ?? data?.invoiceTotal,
+      count: data?.currentInvoices?.count ?? data?.invoiceCount,
+      empty: data?.currentInvoices
+        ? 'Nenhuma fatura registrada para o ciclo atual.'
+        : 'Nenhuma fatura com vencimento neste mês.',
+    },
+    {
+      title: 'Despesas totais do mês',
+      subtitle:
+        'Despesas avulsas, recorrências, compras e parcelas · pagas e pendentes',
+      icon: Wallet,
+      tone: 'orange',
+      value: data?.totalExpenses.total,
+      count: data?.totalExpenses.total === 0 ? 0 : undefined,
+      empty: 'Nenhuma despesa registrada neste período.',
+      isTotal: true,
     },
   ];
   return (
     <>
       {indicators.map(
-        ({ title, subtitle, icon: Icon, tone, value, count, empty }) => (
+        ({
+          title,
+          subtitle,
+          icon: Icon,
+          tone,
+          value,
+          count,
+          empty,
+          isTotal,
+        }) => (
           <Card
             key={title}
-            className="metric-card monthly-indicator"
+            className={`metric-card monthly-indicator${isTotal ? ' monthly-expense-total' : ''}`}
             aria-label={`${title} · ${monthLabel(month)}`}
             aria-busy={query.isFetching}
           >
@@ -80,11 +88,60 @@ export function MonthlyIndicatorCards({ month }: { month: string }) {
                 </strong>
                 <p>{subtitle}</p>
                 {count === 0 && <p>{empty}</p>}
+                {isTotal && data && (
+                  <>
+                    <dl className="expense-total-composition">
+                      <div>
+                        <dt>Despesas fora do cartão, incluindo recorrências</dt>
+                        <dd>{formatMoney(data.totalExpenses.outsideCredit)}</dd>
+                      </div>
+                      <div>
+                        <dt>
+                          {data.currentInvoices
+                            ? 'Compras e parcelas nas faturas do ciclo atual'
+                            : 'Compras e parcelas nas faturas do mês'}
+                        </dt>
+                        <dd>{formatMoney(data.totalExpenses.invoices)}</dd>
+                      </div>
+                    </dl>
+                    {data.totalExpenses.upcomingRecurring > 0 && (
+                      <p>
+                        Inclui{' '}
+                        {formatMoney(data.totalExpenses.upcomingRecurring)} de
+                        próximas recorrências com vencimento futuro, uma por
+                        recorrência sem parcela neste mês.
+                      </p>
+                    )}
+                    <p>
+                      Inclui despesas já pagas. Pagamentos de faturas não são
+                      somados novamente. Recorrências ainda não geradas não
+                      entram no total.
+                    </p>
+                  </>
+                )}
                 {tone === 'blue' && data && (
                   <p>
                     Em aberto:{' '}
-                    <strong>{formatMoney(data.invoiceOutstanding)}</strong>
+                    <strong>
+                      {formatMoney(
+                        data.currentInvoices?.outstanding ??
+                          data.invoiceOutstanding,
+                      )}
+                    </strong>
                   </p>
+                )}
+                {tone === 'blue' && data?.currentInvoices && (
+                  <ul className="current-invoice-dates">
+                    {data.currentInvoices.invoices.map((invoice) => (
+                      <li key={invoice.id}>
+                        <strong>{invoice.name}</strong>
+                        <span>
+                          Fecha {invoice.closing.split('-').reverse().join('/')}{' '}
+                          · vence {invoice.due.split('-').reverse().join('/')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
                 <span className="metric-status">
                   {query.isFetching

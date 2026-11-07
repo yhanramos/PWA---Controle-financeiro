@@ -7,11 +7,11 @@ import {
   databaseError,
   retryDataQuery,
 } from '@/services/data-error';
-import {
-  calculateMonthlyIndicators,
-  indicatorMonthSchema,
-  monthlySchemas,
-} from './monthly-indicators';
+import { indicatorMonthSchema } from './monthly-indicators';
+import { calculateDueItems, dueSchemas as monthlySchemas } from './due-items';
+import { cashReferenceDate } from './cash-balance';
+import { calculateCurrentInvoices } from './current-invoices';
+import { calculateMonthlyExpenses } from './monthly-expenses';
 
 export function useMonthlyIndicators(month: string) {
   const { user, status } = useAuth();
@@ -19,6 +19,7 @@ export function useMonthlyIndicators(month: string) {
     queryKey: ['users', user?.id, 'monthly-indicators', month],
     enabled: status === 'authenticated' && Boolean(user),
     retry: retryDataQuery,
+    networkMode: 'always',
     staleTime: 0,
     refetchInterval: 60_000,
     queryFn: async ({ signal }) => {
@@ -52,19 +53,41 @@ export function useMonthlyIndicators(month: string) {
           if (parsed.data.length < 100) return rows;
         }
       }
-      const [transactions, invoices, installments, plans, payments] =
+      const [transactions, invoices, installments, plans, payments, cards] =
         await Promise.all([
           read('transactions', monthlySchemas.transactions),
           read('credit_card_invoices', monthlySchemas.credit_card_invoices),
           read('installments', monthlySchemas.installments),
           read('installment_plans', monthlySchemas.installment_plans),
           read('invoice_payments', monthlySchemas.invoice_payments),
+          read('credit_cards', monthlySchemas.credit_cards),
         ]);
       signal.throwIfAborted();
-      return calculateMonthlyIndicators(
-        { transactions, invoices, installments, plans, payments },
-        month,
-      );
+      const today = cashReferenceDate();
+      const source = {
+        transactions,
+        credit_card_invoices: invoices,
+        installments,
+        installment_plans: plans,
+        invoice_payments: payments,
+        credit_cards: cards,
+      };
+      const monthly = calculateDueItems(source, month);
+      const currentInvoices =
+        month === today.slice(0, 7)
+          ? calculateCurrentInvoices(source, today)
+          : null;
+      return {
+        ...monthly,
+        today,
+        currentInvoices,
+        totalExpenses: calculateMonthlyExpenses(
+          transactions,
+          month,
+          currentInvoices?.total ?? monthly.invoiceTotal,
+          today,
+        ),
+      };
     },
   });
 }

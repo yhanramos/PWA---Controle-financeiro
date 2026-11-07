@@ -26,6 +26,35 @@ const payment = {
 };
 
 describe('current cash balance', () => {
+  it('shows received funds before expenses while preserving actual cash for remaining balance', () => {
+    const result = calculateCashBalance(
+      [{ ...account, opening_balance_cents: 0 }],
+      [
+        { ...tx, amount_cents: 662000 },
+        { ...tx, kind: 'expense', amount_cents: 31200 },
+      ],
+      [payment],
+      '2026-11-07',
+    );
+    expect(result.totalBeforeExpenses).toBe(662000);
+    expect(result.balance).toBe(630400);
+    expect(result.expenses).toBe(31200);
+    expect(result.invoicePayments).toBe(400);
+  });
+
+  it('does not include pending or future income in the total before expenses', () => {
+    const result = calculateCashBalance(
+      [account],
+      [
+        tx,
+        { ...tx, status: 'pending', settled_on: null },
+        { ...tx, settled_on: '2026-12-01' },
+      ],
+      [],
+      '2026-11-07',
+    );
+    expect(result.totalBeforeExpenses).toBe(11001);
+  });
   it('counts settled cash and invoice payments without counting credit purchases twice', () => {
     const result = calculateCashBalance(
       [account],

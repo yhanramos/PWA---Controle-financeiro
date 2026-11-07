@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { ZodError } from 'zod';
+import { Pencil, Ban, Zap, TriangleAlert } from 'lucide-react';
 import type { Tables } from '@/lib/supabase/database.types';
 import { usePlanAction } from './installment-data';
 import { useInvoices } from '@/features/invoices/invoice-data';
@@ -67,7 +68,7 @@ export function PlanActions({
     }
   }
   return (
-    <div className="page-stack">
+    <div className="installment-actions">
       <div className="finance-form-actions">
         <Button
           disabled={action.isPending || plan.status !== 'active'}
@@ -77,16 +78,19 @@ export function PlanActions({
             setError('');
           }}
         >
+          <Pencil size={16} aria-hidden="true" />
           Editar descrição
         </Button>
         <Button
           disabled={action.isPending || plan.status !== 'active'}
           variant="outline"
+          className="installment-cancel-button"
           onClick={() => {
             setMode('cancel');
             setError('');
           }}
         >
+          <Ban size={16} aria-hidden="true" />
           Cancelar parcelamento
         </Button>
         {allowsEarly && (
@@ -97,12 +101,23 @@ export function PlanActions({
               setError('');
             }}
           >
+            <Zap size={16} aria-hidden="true" />
             Antecipar parcelas
           </Button>
         )}
       </div>
       {mode && (
-        <form className="finance-form" onSubmit={submit}>
+        <form
+          className={`finance-form installment-action-panel${mode === 'cancel' ? ' installment-action-panel--cancel' : ''}`}
+          onSubmit={submit}
+        >
+          <h3>
+            {mode === 'edit'
+              ? 'Editar parcelamento'
+              : mode === 'cancel'
+                ? 'Cancelar este parcelamento?'
+                : 'Antecipar parcelas'}
+          </h3>
           {mode === 'edit' && (
             <>
               <label>
@@ -126,11 +141,14 @@ export function PlanActions({
             </>
           )}
           {mode === 'cancel' && (
-            <p>
-              Confirmar o cancelamento de todas as parcelas deste plano? O
-              histórico será mantido. Faturas com pagamentos exigem estorno
-              prévio.
-            </p>
+            <div className="installment-cancel-notice">
+              <TriangleAlert size={22} aria-hidden="true" />
+              <p>
+                Todas as parcelas de <strong>{plan.description}</strong> serão
+                canceladas. O histórico será mantido. Faturas com pagamentos
+                exigem estorno prévio.
+              </p>
+            </div>
           )}
           {mode === 'anticipate' && (
             <>
@@ -211,14 +229,18 @@ export function PlanActions({
                 (mode === 'anticipate' && (!invoices.data || !accounts.data))
               }
             >
-              {action.isPending ? 'Salvando…' : 'Confirmar'}
+              {action.isPending
+                ? 'Salvando…'
+                : mode === 'cancel'
+                  ? 'Confirmar cancelamento'
+                  : 'Salvar alteração'}
             </Button>
             <Button
               variant="ghost"
               disabled={action.isPending}
               onClick={() => setMode(null)}
             >
-              Voltar
+              {mode === 'cancel' ? 'Manter parcelamento' : 'Voltar'}
             </Button>
           </div>
         </form>

@@ -77,7 +77,19 @@ export function useSaveTransaction() {
       key: string;
     }) => {
       if (!user) throw new DataError('session', 'Entre novamente.');
-      const input = transactionInput.parse(values);
+      const input = transactionInput.parse({
+        ...values,
+        occurred_on:
+          values.kind === 'income' ? values.received_on : values.occurred_on,
+        due_date:
+          values.kind === 'income' ? values.received_on : values.due_date,
+        settled_on:
+          values.status === 'settled'
+            ? values.kind === 'income'
+              ? values.received_on
+              : values.occurred_on
+            : '',
+      });
       const { client, userId } = await userClient(user.id);
       const { data: account, error: accountError } = await client
         .from('accounts')
