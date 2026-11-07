@@ -693,6 +693,22 @@ h3 {
     align-items: center;
   }
 }
+@media (width < 900px) {
+  %mobile-form-control {
+    font-size: 16px;
+  }
+
+  input,
+  select,
+  textarea,
+  .finance-form input,
+  .finance-form select,
+  .finance-form textarea,
+  .ai-chat-form textarea {
+    @extend %mobile-form-control;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -81,6 +81,8 @@ Edge Function autenticada, Gemini, ferramentas autorizadas, schemas, limites de 
 
 ## Etapa 6 — Validação e deploy
 
+Ajuste de 07/11/2026: campos de entrada, seletores e áreas de texto usam fonte de 16px abaixo de 900px (breakpoint do layout mobile), por herança SCSS. Abrange login, cadastros, filtros, perfil e chat para evitar zoom automático ao focar campos no celular. Revisão estática realizada; confirmação em dispositivo real pendente. Build e testes não executados.
+
 Executar verificações após autorização, revisar segurança e isolamento, validar responsividade/acessibilidade, PWA em Android/iOS, conexão instável, cache/atualização, comportamento de logout e configurar hospedagem HTTPS com fallback SPA. Nenhum deploy está incluído na primeira execução.
 
 ## Verificação da fase 1 da Etapa 4 — 02/11/2026
