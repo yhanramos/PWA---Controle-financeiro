@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/features/auth';
 import { ProfilePanel } from '@/features/profile';
+import { WalletPanel } from '@/features/wallet';
 
 export function SettingsPage() {
   const { user } = useAuth();
@@ -14,6 +15,7 @@ export function SettingsPage() {
         <p>O status da fundação, sem atalhos para os seus dados.</p>
       </header>
       <ProfilePanel />
+      <WalletPanel />
       <Card className="settings-panel">
         <ShieldCheck size={28} />
         <h2>Conexão com o Supabase</h2>

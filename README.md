@@ -1,5 +1,7 @@
 # Clareza — Controle financeiro pessoal
 
+**Apple Pay (07/11/2026):** integração via Atalhos para registrar compras no crédito sem manter o PWA aberto. Migration aplicada, função publicada e tipos remotos atualizados. Configuração de chave revogável e associação de cartões em Configurações. Configuração pessoal do Atalho e validação no iPhone pendentes. Veja [APPLE_WALLET.md](docs/APPLE_WALLET.md).
+
 **Dashboard e IA (07/11/2026):** “Saldo total” mostra saldos iniciais + receitas recebidas sem deduções; “Saldo após as contas” aparece em seguida. Indicadores de receitas previstas/despesas pendentes removidos da grade. IA usa crédito por padrão, exceto Pix/débito explícitos. Sem alteração de lançamentos antigos ou nova migration; republicar a função para ativar a regra da IA.
 
 **Revisão do chat (06/11/2026):** conversa apenas na memória da tela, sem histórico salvo ou blocos de sugestões. Cartão informado significa crédito. Após a migration `002`, aplicar `supabase/migrations/20261106000300_ephemeral_ai_chat.sql` e republicar a função. A nova migration remove conteúdo de conversas antigas, preservando despesas e controle técnico contra duplicação. Ainda não aplicada remotamente.

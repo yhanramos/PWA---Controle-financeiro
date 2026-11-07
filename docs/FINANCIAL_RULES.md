@@ -1,5 +1,9 @@
 # Regras financeiras — contrato para implementação
 
+## Apple Pay via Atalhos — 07/11/2026
+
+Somente compras avulsas no crédito em BRL, cartão e categoria padrão por associação explícita. Valor decimal convertido por BigInt; data validada e vencimento pelo ciclo existente de `private.credit_invoice`. Status `posted`, sem saída imediata de caixa. Transação e evento atômicos. UUID identifica reenvios; campos diferentes com mesmo UUID são recusados. UUIDs diferentes não deduplicam compras iguais. O gatilho não comprova aprovação bancária; não há reconciliação de cancelamentos/estornos. Detalhes em [APPLE_WALLET.md](APPLE_WALLET.md).
+
 ## Saldo total e crédito padrão — 07/11/2026
 
 O primeiro indicador passa a ser **Saldo total**, calculado como saldos iniciais + receitas efetivamente recebidas até hoje, sem descontar despesas pagas ou pagamentos de faturas. É acumulado, independente do mês selecionado, e inclui todas as receitas recebidas (não somente a categoria salário). Receitas previstas não entram. Novo campo `totalBeforeExpenses`, somado em BigInt e validado na faixa segura. `balance` continua sendo caixa efetivo para projeção e saldo após as contas, evitando dupla contagem. No exemplo informado: entradas de R$ 6.620 e despesas pagas de R$ 312 resultam em saldo total de R$ 6.620 e caixa efetivo de R$ 6.308.

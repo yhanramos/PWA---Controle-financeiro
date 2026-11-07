@@ -1,5 +1,7 @@
 # Roadmap
 
+Apple Pay — 07/11/2026: integração via Atalhos, configuração no app, chave revogável, associação explícita cartão/categoria e compra atômica com UUID de reenvio. Não depende de PWA aberto; depende do iPhone/internet. Migration `20261107000100_apple_wallet.sql` aplicada, função publicada ACTIVE e tipos remotos regenerados. Configuração pessoal do Atalho e validação real pendentes. Sem débito, parcelas ou fila offline. Instruções em [APPLE_WALLET.md](APPLE_WALLET.md). Build e testes não executados.
+
 IA — 07/11/2026: resolução de nomes abreviados dos cartões (“Inter” → “Cartão Inter”), com limites por palavras e recusa de ambiguidades. Casos unitários escritos, não executados. Republicação de `index.ts` e `card-resolution.ts` pendente; nenhuma migration.
 
 Revisão de 07/11/2026 (Etapas 4/5): indicador “Saldo total” antes de despesas, saldo após as contas na segunda posição e retirada dos cartões de receitas previstas/despesas pendentes. Caixa efetivo mantido nos cálculos de projeção. IA assume crédito, com exceções explícitas de Pix/débito; cartão único pode ser resolvido automaticamente. Sem migration ou alteração de registros anteriores. Casos de saldo escritos, sem execução de testes/build; função Edge requer republicação.
