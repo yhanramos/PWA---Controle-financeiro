@@ -1,6 +1,7 @@
 @use 'primitives';
 
 .remaining-balance {
+  @extend %expense-summary;
   .metric-value {
     overflow-wrap: anywhere;
   }
@@ -9,9 +10,7 @@
   }
 }
 
-.monthly-expense-total {
-  grid-column: 1 / -1;
-  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
+%expense-summary {
   .expense-total-composition {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
@@ -32,6 +31,12 @@
       overflow-wrap: anywhere;
     }
   }
+}
+
+.monthly-expense-total {
+  @extend %expense-summary;
+  grid-column: 1 / -1;
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--border));
 }
 
 .dashboard-filter-note {

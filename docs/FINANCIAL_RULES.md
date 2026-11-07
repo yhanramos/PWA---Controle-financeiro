@@ -1,5 +1,25 @@
 # Regras financeiras — contrato para implementação
 
+## Saldo total e crédito padrão — 07/11/2026
+
+O primeiro indicador passa a ser **Saldo total**, calculado como saldos iniciais + receitas efetivamente recebidas até hoje, sem descontar despesas pagas ou pagamentos de faturas. É acumulado, independente do mês selecionado, e inclui todas as receitas recebidas (não somente a categoria salário). Receitas previstas não entram. Novo campo `totalBeforeExpenses`, somado em BigInt e validado na faixa segura. `balance` continua sendo caixa efetivo para projeção e saldo após as contas, evitando dupla contagem. No exemplo informado: entradas de R$ 6.620 e despesas pagas de R$ 312 resultam em saldo total de R$ 6.620 e caixa efetivo de R$ 6.308.
+
+“Saldo após as contas” sobe para o segundo indicador e mostra composição de saldo total menos despesas pagas, pagamentos de faturas e pendências consideradas no mês/ciclo. Cartões “Receitas previstas” e “Despesas pendentes” removidos da grade; suas consultas continuam necessárias para projeções e vencimentos. Nenhum lançamento existente é alterado.
+
+IA: compras são crédito por padrão, mesmo sem nome de cartão. Pix ou débito explícitos têm prioridade, inclusive se houver menção a cartão. Crédito sem cartão informado usa apenas um cartão ativo único; múltiplos cartões exigem identificação. Pix/débito exigem uma conta resolvida; não inferir vínculo entre cartão e conta de outro nome. Dinheiro/transferência explícitos ou métodos contraditórios são tratados como pedido não suportado nesta fase, sem gravar em crédito silenciosamente. Esta regra substitui a anterior de “cartão sempre crédito”.
+
+Casos do saldo antes de despesas adicionados a `cash-balance.test.ts`, sem execução de testes/build. Sem migration ou reclassificação dos gastos antigos; IA exige republicar a função.
+
+## Despesa avulsa pelo assistente — 06/11/2026
+
+Revisão: cartão identificado no pedido é sempre crédito, sem exigir a palavra “crédito”. Foram removidos os seletores do chat: despesas fora do cartão usam conta e pagamento informados no texto (conta única pode ser resolvida automaticamente). Mensagens são temporárias; somente a despesa e o controle técnico de idempotência ficam no banco. A migration `20261106000300_ephemeral_ai_chat.sql` elimina o histórico textual sem apagar movimentações. Esta revisão substitui as referências a seleções visíveis e histórico persistido abaixo.
+
+Pedido explícito de registro, como “gastei 100 reais com gasolina”, autoriza salvar uma despesa avulsa, com sucesso somente após commit. Sem data explícita, usa hoje em America/Sao_Paulo. O texto precisa indicar um gasto realizado, não hipótese, previsão, recorrência ou parcela. Categoria pode ser inferida entre categorias ativas do usuário; ambiguidades não geram registro.
+
+Despesas fora do crédito não exigem cartão, mas exigem conta e forma de pagamento conhecidas (texto ou seleção visível no chat). Conta única é elegível como padrão, pagamento nunca é inventado. São liquidadas na data informada e afetam caixa. Uma despesa sem origem suficiente pede complemento e não é apresentada como salva. No crédito, exige cartão ativo identificado, usa o ciclo de fechamento vigente e registra compra na fatura, sem criar saída de caixa. Ambos os caminhos reutilizam as validações financeiras existentes e gravam histórico/resposta atomicamente. Um envio cria no máximo uma despesa. Reenvio incerto reutiliza a chave e consulta o resultado anterior; não deve criar nova operação.
+
+Casos de regressão para idempotência, propriedade, datas, valor, crédito e atomicidade estão em `supabase/tests/ai_expenses.sql`, ainda não executados. Migration e função dependem de ativação remota.
+
 ## Saldo após as contas — 06/11/2026
 
 Saldo de caixa atual menos despesas ainda pendentes fora do crédito e saldo em aberto das faturas selecionadas pelo dashboard. Usa o mesmo conjunto do resumo de despesas: vencimentos do mês, próximas recorrências incluídas no mês atual e faturas do ciclo atual. Despesas liquidadas e pagamentos confirmados não são descontados novamente; receitas previstas não são somadas. Saldo negativo é permitido e exibido como insuficiência. Para meses diferentes do atual, é comparação com o caixa de hoje, não saldo histórico ou projeção acumulada. Sem mudança de dados; leituras independentes podem apresentar divergência transitória durante atualização.

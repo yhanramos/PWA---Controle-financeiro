@@ -1,4 +1,4 @@
-import { ArrowDownLeft, ArrowUpRight, CreditCard, Wallet } from 'lucide-react';
+import { CreditCard, Wallet } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatMoney } from '@/lib/financial-money';
@@ -10,24 +10,6 @@ export function MonthlyIndicatorCards({ month }: { month: string }) {
   const query = useMonthlyIndicators(month);
   const data = query.data;
   const indicators = [
-    {
-      title: 'Receitas previstas',
-      subtitle: 'A receber · vencimentos do mês',
-      icon: ArrowDownLeft,
-      tone: 'green',
-      value: data?.income,
-      count: data?.incomeCount,
-      empty: 'Nenhuma receita pendente neste mês.',
-    },
-    {
-      title: 'Despesas pendentes',
-      subtitle: 'A pagar fora do crédito · vencimentos do mês',
-      icon: ArrowUpRight,
-      tone: 'orange',
-      value: data?.expenses,
-      count: data?.expenseCount,
-      empty: 'Nenhuma despesa pendente fora do crédito.',
-    },
     {
       title: data?.currentInvoices
         ? 'Faturas do ciclo atual'

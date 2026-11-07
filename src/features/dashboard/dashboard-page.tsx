@@ -67,12 +67,13 @@ export function DashboardPage() {
         No mês atual, as faturas mostram o ciclo em formação, mesmo com
         vencimento no mês seguinte. Nos outros meses, seguem o vencimento.
         Receitas, despesas e próximos vencimentos seguem o mês escolhido; o
-        caixa é atual e a projeção respeita as datas de pagamento.
+        saldo total acumula entradas até hoje, antes das despesas, e a projeção
+        respeita as datas de pagamento.
       </p>
       <div className="metric-grid">
         <CashBalanceCard />
-        <MonthlyIndicatorCards month={month} />
         <RemainingBalanceCard month={month} />
+        <MonthlyIndicatorCards month={month} />
       </div>
       <DashboardCharts month={month} />
       <div className="dashboard-columns">

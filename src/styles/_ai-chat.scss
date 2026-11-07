@@ -3,18 +3,6 @@
   max-width: 960px;
   margin: 0 auto;
   width: 100%;
-  &-intro {
-    @extend %row;
-    align-items: flex-start;
-    > svg {
-      flex-shrink: 0;
-      color: var(--primary);
-    }
-    p {
-      @extend %muted;
-      margin: 8px 0 0;
-    }
-  }
   &-heading {
     @extend %row;
     justify-content: space-between;

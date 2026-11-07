@@ -24,6 +24,7 @@ import { useProfile } from '@/features/profile';
 
 const navigation = [
   { to: '/', label: 'Visão geral', icon: Grid2X2 },
+  { to: '/assistente', label: 'Assistente IA', icon: MessageCircle },
   { to: '/movimentacoes', label: 'Movimentações', icon: ArrowDownUp },
   { to: '/cartoes', label: 'Cartões', icon: CreditCard },
   { to: '/compras-credito', label: 'Compras no crédito', icon: CreditCard },
@@ -33,8 +34,8 @@ const navigation = [
   { to: '/receitas', label: 'Receitas', icon: TrendingUp },
   { to: '/recorrencias', label: 'Recorrências', icon: Repeat2 },
   { to: '/categorias', label: 'Categorias', icon: Tags },
-  { to: '/assistente', label: 'Assistente IA', icon: MessageCircle },
 ];
+const mobilePrimaryPaths = new Set(['/', '/movimentacoes', '/cartoes']);
 
 export function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -128,17 +129,19 @@ export function AppLayout() {
         </main>
       </div>
       <nav className="mobile-nav" aria-label="Navegação mobile">
-        {navigation.slice(0, 3).map(({ to, label, icon: Icon }) => (
-          <NavLink
-            to={to}
-            key={to}
-            end={to === '/'}
-            onClick={() => setMenuOpen(false)}
-          >
-            <Icon size={20} />
-            <span>{label}</span>
-          </NavLink>
-        ))}
+        {navigation
+          .filter(({ to }) => mobilePrimaryPaths.has(to))
+          .map(({ to, label, icon: Icon }) => (
+            <NavLink
+              to={to}
+              key={to}
+              end={to === '/'}
+              onClick={() => setMenuOpen(false)}
+            >
+              <Icon size={20} />
+              <span>{label}</span>
+            </NavLink>
+          ))}
         <button
           type="button"
           aria-expanded={menuOpen}
@@ -152,7 +155,7 @@ export function AppLayout() {
       {menuOpen && (
         <nav id="mobile-menu" className="mobile-menu" aria-label="Mais páginas">
           {[
-            ...navigation.slice(3),
+            ...navigation.filter(({ to }) => !mobilePrimaryPaths.has(to)),
             { to: '/configuracoes', label: 'Configurações', icon: Settings2 },
           ].map(({ to, label, icon: Icon }) => (
             <NavLink key={to} to={to} onClick={() => setMenuOpen(false)}>

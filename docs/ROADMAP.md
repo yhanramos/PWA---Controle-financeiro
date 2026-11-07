@@ -1,5 +1,9 @@
 # Roadmap
 
+IA — 07/11/2026: resolução de nomes abreviados dos cartões (“Inter” → “Cartão Inter”), com limites por palavras e recusa de ambiguidades. Casos unitários escritos, não executados. Republicação de `index.ts` e `card-resolution.ts` pendente; nenhuma migration.
+
+Revisão de 07/11/2026 (Etapas 4/5): indicador “Saldo total” antes de despesas, saldo após as contas na segunda posição e retirada dos cartões de receitas previstas/despesas pendentes. Caixa efetivo mantido nos cálculos de projeção. IA assume crédito, com exceções explícitas de Pix/débito; cartão único pode ser resolvido automaticamente. Sem migration ou alteração de registros anteriores. Casos de saldo escritos, sem execução de testes/build; função Edge requer republicação.
+
 ## Etapa 1 — Fundação (código entregue)
 
 - [x] Inspeção da pasta vazia e leitura do pedido.
@@ -62,6 +66,14 @@ Verificação de 06/11/2026: `node node_modules/typescript/bin/tsc --noEmit` e `
 Fase 1 reutiliza as tabelas existentes; nenhuma migration adicional. Casos de cálculo escritos, mas não executados. Build e testes continuam proibidos pelas instruções atuais.
 
 ## Etapa 5 — Inteligência artificial
+
+Revisão de 06/11/2026: conversa somente em memória até sair/recarregar, sem recuperação de histórico ou blocos de sugestões/seletores. Cartão identificado sempre significa crédito. Migration incremental `20261106000300_ephemeral_ai_chat.sql` remove conteúdo antigo do chat e mantém hash/estado para reenvios, sem alterar despesas; aplicação remota e republicação da função pendentes. Casos SQL atualizados, sem execução de testes/build.
+
+Despesas pelo chat (06/11/2026): usuário confirmou consultas após ajustar o modelo. Implementados localmente registro de uma despesa avulsa paga fora do crédito ou compra avulsa em cartão identificado, resolução de categorias/contas/cartões, gravação atômica com histórico, proteção de reenvio e rolagem automática. Nova migration `20261106000200_ai_expenses.sql` e republicação da função ainda necessárias. TypeScript e ESLint passaram; casos SQL escritos, sem execução. Build, testes e validação visual não executados. Parcelas, receitas, recorrências, alterações e contexto de rascunhos no chat seguem pendentes; não considerar a Etapa 5 concluída.
+
+Publicação em 06/11/2026: usuário cadastrou secrets; nomes conferidos, sem exposição dos valores. Edge Function `financial-assistant` publicada e confirmada `ACTIVE`, versão 1, `verify_jwt=true`. Migration já aplicada. Próxima verificação: primeira consulta autenticada pelo aplicativo. Sem chamada ao Gemini nesta rodada; build e testes não executados. Esta atualização supera as pendências de implantação registradas abaixo.
+
+Atualização de 06/11/2026: `20261106000100_ai_read_assistant.sql` aplicada no Supabase via SQL direto da CLI/Management API, após confirmar projeto e ausência das estruturas. Conferência de metadados confirmou tabela, três funções e permissões (anon sem execução; authenticated sem INSERT no chat nem finalização; backend autorizado a finalizar). Esta confirmação supera as notas de migration pendente abaixo. Secrets e publicação da Edge Function continuam pendentes. Nenhum build/teste ou chamada Gemini executado. SQL direto não registra automaticamente o histórico da CLI: conciliar antes de usar `db push`; não reaplicar.
 
 Fase 1 em código (06/11/2026): chat com histórico, Edge Function autenticada, Gemini como classificador estruturado, ferramenta de consulta financeira por vencimento, reservas idempotentes e limites persistidos. Migration e implantação ainda pendentes; nenhum secret cadastrado, SQL executado ou chamada real ao provedor. Escritas com confirmação, consultas por cartão e validação integrada continuam pendentes. Detalhes em [AI_INTEGRATION.md](AI_INTEGRATION.md). Não considerar a Etapa 5 concluída.
 

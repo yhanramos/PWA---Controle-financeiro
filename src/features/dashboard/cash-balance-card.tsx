@@ -12,11 +12,11 @@ export function CashBalanceCard() {
   return (
     <Card
       className="metric-card cash-balance"
-      aria-label="Saldo de caixa atual"
+      aria-label="Saldo total antes das despesas"
       aria-busy={query.isFetching}
     >
       <div className="metric-header">
-        <span>Saldo de caixa</span>
+        <span>Saldo total</span>
         <span className="metric-icon metric-icon--violet">
           <Wallet size={19} />
         </span>
@@ -43,11 +43,12 @@ export function CashBalanceCard() {
       ) : (
         <>
           <strong className="metric-value" aria-live="polite">
-            {formatMoney(data.balance)}
+            {formatMoney(data.totalBeforeExpenses)}
           </strong>
           <p>
-            Saldo atual até {data.referenceDate.split('-').reverse().join('/')}{' '}
-            · todas as contas, inclusive inativas.
+            Saldos iniciais e receitas recebidas até{' '}
+            {data.referenceDate.split('-').reverse().join('/')}. Sem descontar
+            despesas ou faturas.
           </p>
           {data.accountCount === 0 ? (
             <p>
@@ -65,14 +66,6 @@ export function CashBalanceCard() {
                 <div>
                   <dt>+ Receitas recebidas</dt>
                   <dd>{formatMoney(data.income)}</dd>
-                </div>
-                <div>
-                  <dt>− Despesas pagas</dt>
-                  <dd>{formatMoney(data.expenses)}</dd>
-                </div>
-                <div>
-                  <dt>− Pagamentos de faturas</dt>
-                  <dd>{formatMoney(data.invoicePayments)}</dd>
                 </div>
               </dl>
             </details>

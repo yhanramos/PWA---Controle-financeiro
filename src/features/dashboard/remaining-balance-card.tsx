@@ -26,10 +26,7 @@ export function RemainingBalanceCard({ month }: { month: string }) {
     }
   }
   return (
-    <Card
-      className="metric-card monthly-expense-total remaining-balance"
-      aria-busy={busy}
-    >
+    <Card className="metric-card remaining-balance" aria-busy={busy}>
       <div className="metric-header">
         <span>Saldo após as contas</span>
         <span className="metric-icon metric-icon--green">
@@ -66,8 +63,16 @@ export function RemainingBalanceCard({ month }: { month: string }) {
           </p>
           <dl className="expense-total-composition">
             <div>
-              <dt>Saldo de caixa atual</dt>
-              <dd>{formatMoney(cash.data.balance)}</dd>
+              <dt>Saldo total antes das despesas</dt>
+              <dd>{formatMoney(cash.data.totalBeforeExpenses)}</dd>
+            </div>
+            <div>
+              <dt>− Despesas já pagas</dt>
+              <dd>{formatMoney(cash.data.expenses)}</dd>
+            </div>
+            <div>
+              <dt>− Pagamentos de faturas</dt>
+              <dd>{formatMoney(cash.data.invoicePayments)}</dd>
             </div>
             <div>
               <dt>− Contas ainda a pagar</dt>
